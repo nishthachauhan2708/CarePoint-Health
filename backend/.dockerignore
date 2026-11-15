@@ -1,0 +1,17 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.pytest_cache
+*.db
+*.sqlite3
+carehealth.db
+test_carehealth.db
+.git
+.gitignore
+.env
+.vscode
+Dockerfile

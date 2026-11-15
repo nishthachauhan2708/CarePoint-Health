@@ -1,0 +1,83 @@
+version: '3.8'
+
+# ==============================================================================
+# CareHealth Point – Full Stack Docker Compose Orchestration
+# Course: DevOps & Automation Lab (ENSP461)
+# ==============================================================================
+
+services:
+  # PostgreSQL Relational Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: carehealth-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-carehealth_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-carehealth_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-carehealth_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-carehealth_admin} -d ${POSTGRES_DB:-carehealth_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - carehealth-network
+
+  # FastAPI REST Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: carehealth-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-carehealth_admin}:${POSTGRES_PASSWORD:-carehealth_secure_pass_2026}@postgres:5432/${POSTGRES_DB:-carehealth_db}
+      SECRET_KEY: ${SECRET_KEY:-carehealth-super-secret-key-change-in-production-2026}
+      ALGORITHM: HS256
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - carehealth-network
+
+  # React TypeScript + Nginx Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: carehealth-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - carehealth-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  carehealth-network:
+    driver: bridge
