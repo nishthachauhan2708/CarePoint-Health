@@ -1,0 +1,33 @@
+---
+# Tasks for Kubernetes Prerequisites Role
+- name: Ensure conntrack and iptables are present
+  apt:
+    name:
+      - conntrack
+      - iptables
+      - socat
+    state: present
+  become: yes
+
+- name: Download stable kubectl binary
+  get_url:
+    url: "https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+  become: yes
+
+- name: Download Minikube binary for local cluster simulation
+  get_url:
+    url: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+    dest: /usr/local/bin/minikube
+    mode: '0755'
+  become: yes
+
+- name: Verify kubectl version
+  command: kubectl version --client=true
+  register: kubectl_ver
+  changed_when: false
+
+- name: Display kubectl client version
+  debug:
+    msg: "Kubectl client installed successfully: {{ kubectl_ver.stdout }}"

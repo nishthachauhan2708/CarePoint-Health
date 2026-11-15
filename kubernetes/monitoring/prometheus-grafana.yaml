@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carehealth-prometheus
+  namespace: carehealth
+  labels:
+    app: carehealth-prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carehealth-prometheus
+  template:
+    metadata:
+      labels:
+        app: carehealth-prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.48.0
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+          ports:
+            - containerPort: 9090
+              name: web
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carehealth-prometheus-service
+  namespace: carehealth
+spec:
+  type: NodePort
+  ports:
+    - port: 9090
+      targetPort: 9090
+      nodePort: 30090
+  selector:
+    app: carehealth-prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carehealth-grafana
+  namespace: carehealth
+  labels:
+    app: carehealth-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carehealth-grafana
+  template:
+    metadata:
+      labels:
+        app: carehealth-grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:10.2.0
+          ports:
+            - containerPort: 3000
+              name: web
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "CareHealthGrafana@2026"
+            - name: GF_USERS_ALLOW_SIGN_UP
+              value: "false"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carehealth-grafana-service
+  namespace: carehealth
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30030
+  selector:
+    app: carehealth-grafana

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: carehealth-backend-active-service
+  namespace: carehealth
+  labels:
+    app: carehealth-backend
+    role: active-traffic-router
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: http
+  # Traffic switch point: changing version: blue -> green directs 100% of live traffic immediately!
+  selector:
+    app: carehealth-backend
+    version: blue

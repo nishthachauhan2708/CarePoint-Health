@@ -1,0 +1,20 @@
+---
+# ==============================================================================
+# CareHealth Point – Master Infrastructure & Application Playbook
+# Course: DevOps & Automation Lab (ENSP461)
+# ==============================================================================
+
+- name: Configure Docker Host Prerequisites
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  roles:
+    - docker
+    - kubernetes
+
+- name: Deploy CareHealth Point Application Stack
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  roles:
+    - app_deploy

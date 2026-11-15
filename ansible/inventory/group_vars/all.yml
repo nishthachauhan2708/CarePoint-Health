@@ -1,0 +1,22 @@
+---
+# CareHealth Point Global Automation Variables
+app_name: carehealth-point
+app_version: 1.0.0
+app_env: production
+install_dir: /opt/carehealth-point
+
+# Docker Configuration
+docker_users:
+  - ubuntu
+  - jenkins
+
+# Kubernetes Configuration
+k8s_namespace: carehealth
+minikube_driver: docker
+minikube_cpus: 4
+minikube_memory: 8192
+
+# Database Settings
+db_user: carehealth_admin
+db_name: carehealth_db
+db_password: carehealth_secure_pass_2026

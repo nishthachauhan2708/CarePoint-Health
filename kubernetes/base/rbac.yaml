@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: carehealth-service-account
+  namespace: carehealth
+  labels:
+    app.kubernetes.io/name: carehealth-point
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: carehealth-app-role
+  namespace: carehealth
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: carehealth-app-rolebinding
+  namespace: carehealth
+subjects:
+  - kind: ServiceAccount
+    name: carehealth-service-account
+    namespace: carehealth
+roleRef:
+  kind: Role
+  name: carehealth-app-role
+  apiGroup: rbac.authorization.k8s.io

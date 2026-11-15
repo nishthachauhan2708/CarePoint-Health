@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: carehealth-point-gitops
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: carehealth-point
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/carehealth/carehealth-point.git'
+    targetRevision: main
+    path: kubernetes/base
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: carehealth
+  syncPolicy:
+    automated:
+      prune: true       # Automatically deletes resources removed from Git
+      selfHeal: true    # Reconciles cluster state if manual changes cause drift
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
