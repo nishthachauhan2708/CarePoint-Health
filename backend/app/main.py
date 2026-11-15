@@ -1,4 +1,6 @@
 import time
+import app.models
+from sqlalchemy import text
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
@@ -72,7 +74,7 @@ def readiness_check():
     """Readiness probe: verifies that database connectivity is active."""
     try:
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         return {"status": "ready", "database": "connected"}
     except Exception as e:
         return Response(content=f'{{"status": "not ready", "error": "{str(e)}"}}', status_code=503, media_type="application/json")

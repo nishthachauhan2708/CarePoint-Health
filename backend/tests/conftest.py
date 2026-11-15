@@ -76,6 +76,22 @@ def setup_test_db():
         consultation_fee=500.0
     )
     db.add(doc)
+    db.commit()
+    db.refresh(doc)
+
+    # Add 7-day schedule for test doctor
+    from app.models.doctor_availability import DoctorAvailability
+    for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]:
+        av = DoctorAvailability(
+            doctor_id=doc.id,
+            day_of_week=day,
+            start_time="09:00",
+            end_time="17:00",
+            slot_duration_minutes=30,
+            is_available=True
+        )
+        db.add(av)
+    db.commit()
 
     # Create Patient User & Profile
     pat_user = User(

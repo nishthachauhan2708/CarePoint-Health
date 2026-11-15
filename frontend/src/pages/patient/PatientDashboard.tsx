@@ -502,25 +502,31 @@ export const PatientDashboard: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-2">Available Slots</label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {availableSlots.map((s, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          disabled={s.is_booked}
-                          onClick={() => setSelectedSlot(s.slot)}
-                          className={`py-2 px-3 text-xs rounded-lg border font-semibold transition-all ${
-                            s.is_booked 
-                              ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed line-through'
-                              : selectedSlot === s.slot
-                              ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
-                              : 'bg-white text-slate-700 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50'
-                          }`}
-                        >
-                          {s.slot}
-                        </button>
-                      ))}
-                    </div>
+                    {availableSlots.length > 0 ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {availableSlots.map((s, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            disabled={s.is_booked}
+                            onClick={() => setSelectedSlot(s.slot)}
+                            className={`py-2 px-3 text-xs rounded-lg border font-semibold transition-all ${
+                              s.is_booked 
+                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed line-through'
+                                : selectedSlot === s.slot
+                                ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50'
+                            }`}
+                          >
+                            {s.slot}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-amber-700 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                        No available slots for this date. The doctor may be off-duty or fully booked. Please select another date.
+                      </p>
+                    )}
                   </div>
 
                   <div className="pt-2">

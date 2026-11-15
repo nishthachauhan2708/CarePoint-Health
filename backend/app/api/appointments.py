@@ -7,6 +7,7 @@ from app.database.session import get_db
 from app.models.appointment import Appointment
 from app.models.patient import Patient
 from app.models.doctor import Doctor
+from app.models.doctor_availability import DoctorAvailability
 from app.models.department import Department
 from app.models.user import User
 from app.models.notification import Notification
@@ -40,6 +41,26 @@ def book_appointment(
     dept = db.query(Department).filter(Department.id == appt_in.department_id).first()
     if not dept:
         raise HTTPException(status_code=404, detail="Department not found")
+
+    # Prevent booking appointments for past dates
+    if appt_in.appointment_date < date.today():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot book appointments for past dates. Please select today or a future date."
+        )
+
+    # Verify doctor is working on this day of the week
+    day_name = appt_in.appointment_date.strftime("%A")
+    avail = db.query(DoctorAvailability).filter(
+        DoctorAvailability.doctor_id == appt_in.doctor_id,
+        DoctorAvailability.day_of_week == day_name,
+        DoctorAvailability.is_available == True
+    ).first()
+    if not avail:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Dr. {doc.user.full_name if doc.user else 'Doctor'} is not scheduled for consultations on {day_name}s."
+        )
 
     # Prevent duplicate bookings: check if slot is already occupied
     existing = db.query(Appointment).filter(
@@ -213,6 +234,11 @@ def update_appointment_status(
         if new_status != "cancelled":
             raise HTTPException(status_code=403, detail="Patients may only cancel appointments")
 
+    # Doctor can only update their own appointments
+    if current_user.role == "doctor":
+        if not a.doctor or a.doctor.user_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Doctors may only update appointments assigned to them")
+
     a.status = new_status
     db.commit()
     db.refresh(a)
@@ -247,10 +273,20 @@ def update_appointment_status(
     )
 
 @router.get("/{id}/queue", response_model=QueueStatus)
-def get_appointment_queue_status(id: int, db: Session = Depends(get_db)):
+def get_appointment_queue_status(
+    id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     a = db.query(Appointment).filter(Appointment.id == id).first()
     if not a:
         raise HTTPException(status_code=404, detail="Appointment not found")
+
+    # Access control: patient or doctor assigned to this appointment, or admin/receptionist
+    if current_user.role == "patient" and (not a.patient or a.patient.user_id != current_user.id):
+        raise HTTPException(status_code=403, detail="Access denied")
+    if current_user.role == "doctor" and (not a.doctor or a.doctor.user_id != current_user.id):
+        raise HTTPException(status_code=403, detail="Access denied")
 
     # Find appointments ahead of this one for the same doctor and date that are not completed or cancelled
     completed_or_serving = db.query(func.count(Appointment.id)).filter(

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Activity, ShieldAlert, User, LogOut, LayoutDashboard, 
-  Bell, ChevronDown, CheckCircle2 
+  Stethoscope, Building2, PhoneCall, ChevronDown, CheckCircle2,
+  CalendarCheck, UserCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
@@ -10,6 +11,7 @@ import { UserRole } from '../../types';
 export const Navbar: React.FC = () => {
   const { user, logout, quickLoginAs } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isDemoDropdownOpen, setIsDemoDropdownOpen] = useState(false);
 
   const handleRoleSwitch = async (role: UserRole) => {
@@ -17,6 +19,8 @@ export const Navbar: React.FC = () => {
     await quickLoginAs(role);
     navigate(`/dashboard/${role}`);
   };
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
@@ -37,17 +41,29 @@ export const Navbar: React.FC = () => {
 
           {/* Navigation links */}
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-600">
-            <Link to="/" className="hover:text-teal-600 transition-colors">Home</Link>
-            <a href="#departments" className="hover:text-teal-600 transition-colors">Departments</a>
-            <a href="#doctors" className="hover:text-teal-600 transition-colors">Specialists</a>
-            <a href="#emergency" className="hover:text-teal-600 transition-colors text-rose-600 font-semibold flex items-center gap-1">
+            <Link 
+              to="/" 
+              className={`transition-colors ${isActive('/') ? 'text-teal-600 font-semibold' : 'hover:text-teal-600'}`}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/doctors" 
+              className={`transition-colors flex items-center gap-1.5 ${isActive('/doctors') ? 'text-teal-600 font-semibold' : 'hover:text-teal-600'}`}
+            >
+              <Stethoscope className="w-4 h-4" />
+              <span>Find Doctors</span>
+            </Link>
+            <a href="/#departments" className="hover:text-teal-600 transition-colors">Departments</a>
+            <a href="/#services" className="hover:text-teal-600 transition-colors">Services</a>
+            <a href="/#emergency" className="hover:text-rose-700 transition-colors text-rose-600 font-semibold flex items-center gap-1">
               <ShieldAlert className="w-4 h-4" /> 24/7 Emergency
             </a>
           </nav>
 
           {/* Right Action buttons */}
           <div className="flex items-center space-x-3">
-            {/* Quick Demo Role Switcher for Viva & Evaluation */}
+            {/* Quick Demo Role Switcher for Viva Evaluation */}
             <div className="relative">
               <button 
                 onClick={() => setIsDemoDropdownOpen(!isDemoDropdownOpen)}
@@ -60,7 +76,7 @@ export const Navbar: React.FC = () => {
               {isDemoDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2">
                   <div className="px-3 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                    Switch Active Role
+                    Switch Active Persona (Evaluation)
                   </div>
                   <button 
                     onClick={() => handleRoleSwitch('admin')}
@@ -98,14 +114,14 @@ export const Navbar: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Link
                   to={`/dashboard/${user.role}`}
-                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm transition-colors"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   <span className="capitalize">{user.role} Dashboard</span>
                 </Link>
                 <button
                   onClick={logout}
-                  title="Logout"
+                  title="Sign Out"
                   className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
@@ -120,10 +136,11 @@ export const Navbar: React.FC = () => {
                   Sign In
                 </Link>
                 <Link
-                  to="/register"
-                  className="px-3.5 py-1.5 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm transition-colors"
+                  to="/doctors"
+                  className="px-3.5 py-1.5 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
                 >
-                  Book Appointment
+                  <CalendarCheck className="w-4 h-4" />
+                  <span>Book Appointment</span>
                 </Link>
               </div>
             )}

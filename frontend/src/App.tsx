@@ -8,6 +8,8 @@ import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { DoctorDirectoryPage } from './pages/DoctorDirectoryPage';
+import { DoctorProfilePage } from './pages/DoctorProfilePage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { DoctorDashboard } from './pages/doctor/DoctorDashboard';
 import { PatientDashboard } from './pages/patient/PatientDashboard';
@@ -26,6 +28,8 @@ export const App: React.FC = () => {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/doctors" element={<DoctorDirectoryPage />} />
+              <Route path="/doctors/:id" element={<DoctorProfilePage />} />
 
               {/* Protected Clinical Dashboards */}
               <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

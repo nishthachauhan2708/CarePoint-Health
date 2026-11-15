@@ -115,13 +115,42 @@ def get_available_slots(id: int, date_str: str = Query(..., description="Format 
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format. Expected YYYY-MM-DD")
     
-    # Standard time slots
-    all_slots = [
-        "09:00 - 09:30", "09:30 - 10:00", "10:00 - 10:30", "10:30 - 11:00",
-        "11:30 - 12:00", "12:00 - 12:30", "14:00 - 14:30", "14:30 - 15:00",
-        "15:30 - 16:00", "16:00 - 16:30"
-    ]
-    
+    day_name = appt_date.strftime("%A")
+    avail = db.query(DoctorAvailability).filter(
+        DoctorAvailability.doctor_id == id,
+        DoctorAvailability.day_of_week == day_name,
+        DoctorAvailability.is_available == True
+    ).first()
+
+    if not avail:
+        return {
+            "doctor_id": id,
+            "date": date_str,
+            "day_of_week": day_name,
+            "is_working_day": False,
+            "message": f"Dr. {doc.user.full_name if doc.user else 'Doctor'} is not scheduled for OPD consultations on {day_name}s.",
+            "slots": []
+        }
+
+    # Generate dynamic slots from working hours and slot duration
+    from datetime import datetime, timedelta
+    try:
+        start_dt = datetime.strptime(avail.start_time, "%H:%M")
+        end_dt = datetime.strptime(avail.end_time, "%H:%M")
+    except ValueError:
+        start_dt = datetime.strptime("09:00", "%H:%M")
+        end_dt = datetime.strptime("17:00", "%H:%M")
+
+    step_minutes = avail.slot_duration_minutes if avail.slot_duration_minutes > 0 else 30
+    step = timedelta(minutes=step_minutes)
+
+    generated_slots = []
+    curr = start_dt
+    while curr + step <= end_dt:
+        next_dt = curr + step
+        generated_slots.append(f"{curr.strftime('%H:%M')} - {next_dt.strftime('%H:%M')}")
+        curr = next_dt
+
     # Query booked appointments for this doctor on that date (excluding cancelled)
     booked = db.query(Appointment.time_slot).filter(
         Appointment.doctor_id == id,
@@ -132,11 +161,14 @@ def get_available_slots(id: int, date_str: str = Query(..., description="Format 
 
     slot_availability = [
         {"slot": s, "is_booked": s in booked_slots}
-        for s in all_slots
+        for s in generated_slots
     ]
+
     return {
         "doctor_id": id,
         "date": date_str,
+        "day_of_week": day_name,
+        "is_working_day": True,
         "slots": slot_availability
     }
 
