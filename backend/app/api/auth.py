@@ -1,6 +1,7 @@
 import random
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.core.security import verify_password, get_password_hash, create_access_token
@@ -13,72 +14,87 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    # Check if user with email already exists
-    existing = db.query(User).filter(User.email == user_in.email).first()
+    # Normalize email to lowercase stripped
+    normalized_email = user_in.email.strip().lower()
+
+    # Case-insensitive check if user with email already exists
+    existing = db.query(User).filter(func.lower(User.email) == normalized_email).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A user with this email address already exists"
+            detail="An account with this email address already exists. Please log in instead."
         )
     
-    # Restrict direct registration to patient or doctor/receptionist for testing
+    # Public registration is strictly for patient role to prevent unauthorized privilege escalation
+    # Admin, Doctor, and Receptionist accounts are created through administrative provisioning or seeds
+    assigned_role = "patient"
+
+    clean_full_name = user_in.full_name.strip()
+    clean_phone = user_in.phone_number.strip() if user_in.phone_number else None
+
     user = User(
-        email=user_in.email,
+        email=normalized_email,
         hashed_password=get_password_hash(user_in.password),
-        full_name=user_in.full_name,
-        role=user_in.role,
-        phone_number=user_in.phone_number,
+        full_name=clean_full_name,
+        role=assigned_role,
+        phone_number=clean_phone,
         is_active=True
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
-    # If registered as a patient, auto-create a patient record
-    if user.role == "patient":
+    # Auto-generate a guaranteed unique patient UHID
+    for _ in range(10):
         random_suffix = random.randint(1000, 9999)
         uhid = f"CHP-2026-{random_suffix}"
-        patient = Patient(
-            user_id=user.id,
-            patient_uhid=uhid,
-            date_of_birth=date(1995, 1, 1),
-            gender="Not Specified",
-            blood_group="O+",
-            emergency_contact_name="Family Contact",
-            emergency_contact_phone=user.phone_number or "9876543210",
-            address="New Delhi, India"
-        )
-        db.add(patient)
-        db.commit()
+        if not db.query(Patient).filter(Patient.patient_uhid == uhid).first():
+            break
+
+    patient = Patient(
+        user_id=user.id,
+        patient_uhid=uhid,
+        date_of_birth=date(1995, 1, 1),
+        gender="Not Specified",
+        blood_group="O+",
+        emergency_contact_name="Emergency Contact",
+        emergency_contact_phone=clean_phone or "9876543210",
+        address="New Delhi, India"
+    )
+    db.add(patient)
+    db.commit()
 
     token = create_access_token(subject=user.id, role=user.role)
     return Token(
         access_token=token,
         token_type="bearer",
-        user=UserOut.from_orm(user)
+        user=UserOut.model_validate(user)
     )
 
 @router.post("/login", response_model=Token)
 def login(login_data: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == login_data.email).first()
+    # Normalize email to lowercase stripped for case-insensitive lookup
+    normalized_email = login_data.email.strip().lower()
+
+    user = db.query(User).filter(func.lower(User.email) == normalized_email).first()
     if not user or not verify_password(login_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect email or password. Please verify your credentials and try again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user account"
+            detail="Your account is deactivated. Please contact hospital administration."
         )
     
     token = create_access_token(subject=user.id, role=user.role)
     return Token(
         access_token=token,
         token_type="bearer",
-        user=UserOut.from_orm(user)
+        user=UserOut.model_validate(user)
     )
 
 @router.get("/me", response_model=dict)

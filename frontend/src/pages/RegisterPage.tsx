@@ -1,36 +1,70 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Activity, User, Mail, Lock, Phone, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Activity, User, Mail, Lock, Phone, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [role, setRole] = useState<'patient' | 'doctor' | 'receptionist'>('patient');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = fullName.trim();
+    const cleanPhone = phoneNumber.trim();
+
+    if (!cleanName) {
+      setError('Please provide your full legal name.');
+      return;
+    }
+
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please verify both fields.');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const user = await register({
-        full_name: fullName,
-        email,
-        password,
-        phone_number: phoneNumber,
-        role
+        full_name: cleanName,
+        email: cleanEmail,
+        password: password,
+        phone_number: cleanPhone || undefined,
+        role: 'patient',
       });
-      navigate(`/dashboard/${user.role}`);
+      
+      const targetPath = (location.state as any)?.from || `/dashboard/${user.role}`;
+      navigate(targetPath);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed. Please verify details.');
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        // Pydantic validation error array
+        setError(detail.map((d: any) => d.msg || d).join(', '));
+      } else {
+        setError(detail || 'Registration failed. Please check your information and try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -48,8 +82,10 @@ export const RegisterPage: React.FC = () => {
             </div>
             <span className="text-2xl font-extrabold text-slate-900 tracking-tight">CareHealth Point</span>
           </Link>
-          <h2 className="text-xl font-bold text-slate-800">Create Healthcare Account</h2>
-          <p className="text-xs text-slate-500 mt-1">Get instant Digital Health Card & appointment booking</p>
+          <h2 className="text-xl font-bold text-slate-800">Create Patient Account</h2>
+          <p className="text-xs text-slate-500 mt-1">
+            Register with your personal email for a permanent Digital Health Card & instant appointment bookings
+          </p>
         </div>
 
         {/* Register Card */}
@@ -61,46 +97,15 @@ export const RegisterPage: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Account Role</label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setRole('patient')}
-                  className={`py-2 text-xs font-semibold rounded-lg border transition-all ${
-                    role === 'patient' 
-                      ? 'bg-teal-50 border-teal-600 text-teal-800' 
-                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  Patient
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('doctor')}
-                  className={`py-2 text-xs font-semibold rounded-lg border transition-all ${
-                    role === 'doctor' 
-                      ? 'bg-teal-50 border-teal-600 text-teal-800' 
-                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  Doctor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('receptionist')}
-                  className={`py-2 text-xs font-semibold rounded-lg border transition-all ${
-                    role === 'receptionist' 
-                      ? 'bg-teal-50 border-teal-600 text-teal-800' 
-                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  Receptionist
-                </button>
-              </div>
-            </div>
+          {/* Role Policy Notice */}
+          <div className="mb-5 p-3 rounded-xl bg-teal-50/70 border border-teal-200/60 flex items-start gap-2.5">
+            <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+            <p className="text-[11px] text-teal-800 leading-relaxed">
+              Public registration creates a secure <strong>Patient UHID</strong> profile. Clinical staff (Doctors, Receptionists, Administrators) are securely provisioned by hospital admins or accessible via the Demo Switcher.
+            </p>
+          </div>
 
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Full Legal Name</label>
               <div className="relative">
@@ -132,12 +137,11 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number (Optional)</label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
                   type="tel"
-                  required
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="+91-9876543210"
@@ -146,18 +150,35 @@ export const RegisterPage: React.FC = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Secure Password</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min 6 characters"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Confirm Password</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat password"
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
               </div>
             </div>
 
@@ -170,7 +191,7 @@ export const RegisterPage: React.FC = () => {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span>Complete Registration</span>
+                  <span>Create Account & Get UHID</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Activity, Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
@@ -7,6 +7,7 @@ import { UserRole } from '../types';
 export const LoginPage: React.FC = () => {
   const { login, quickLoginAs } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,13 +17,31 @@ export const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      setError('Please enter your email address.');
+      return;
+    }
+
+    if (!password) {
+      setError('Please enter your account password.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const user = await login(email, password);
-      navigate(`/dashboard/${user.role}`);
+      const user = await login(cleanEmail, password);
+      const targetPath = (location.state as any)?.from || `/dashboard/${user.role}`;
+      navigate(targetPath);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Invalid email or password. Please try again.');
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map((d: any) => d.msg || d).join(', '));
+      } else {
+        setError(detail || 'Invalid email address or password. Please verify and try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -33,7 +52,8 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
     try {
       await quickLoginAs(role);
-      navigate(`/dashboard/${role}`);
+      const targetPath = (location.state as any)?.from || `/dashboard/${role}`;
+      navigate(targetPath);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Quick demo login failed.');
     } finally {
@@ -102,7 +122,7 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Standard Login Form */}
+        {/* Standard Real Login Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
@@ -121,7 +141,7 @@ export const LoginPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@carehealth.com"
+                  placeholder="yourname@gmail.com"
                   className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
@@ -151,7 +171,7 @@ export const LoginPage: React.FC = () => {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Sign In to Account</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

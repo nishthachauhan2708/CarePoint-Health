@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg_ananya" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF3C7" />
+      <stop offset="100%" stop-color="#FDE68A" />
+    </linearGradient>
+    <linearGradient id="skin_ananya" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5CBA7" />
+      <stop offset="100%" stop-color="#EBB38A" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#bg_ananya)" />
+
+  <!-- Hair Back Layer (Neat medical bun / ponytail) -->
+  <path d="M60 85c0 30 8 55 18 64h44c10-9 18-34 18-64 0-25-14-40-40-40s-40 15-40 40z" fill="#2D241E" />
+  <circle cx="100" cy="45" r="14" fill="#2D241E" />
+
+  <!-- Shoulders & Coat -->
+  <path d="M32 200c0-36 30-56 68-56s68 20 68 56z" fill="#FFFFFF" stroke="#CBD5E0" stroke-width="2" />
+
+  <!-- Pediatric Soft Coral/Teal scrub top -->
+  <path d="M84 144l16 28 16-28z" fill="#0D9488" />
+  <path d="M100 144l-12-16h24z" fill="#5EEAD4" />
+
+  <!-- Coat Front -->
+  <path d="M72 144l18 56H46c-7-12-12-25-14-38l40-18z" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+  <path d="M128 144l-18 56h44c7-12 12-25 14-38l-40-18z" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+
+  <!-- Cheerful Pediatric Stethoscope (Bright teal with child-friendly bell) -->
+  <path d="M70 146c-2 18 8 36 22 36s18-12 18-24" fill="none" stroke="#0D9488" stroke-width="4.5" stroke-linecap="round" />
+  <path d="M130 146c2 18-8 30-16 32" fill="none" stroke="#0D9488" stroke-width="4.5" stroke-linecap="round" />
+  <circle cx="112" cy="158" r="7" fill="#F59E0B" stroke="#B45309" stroke-width="2" />
+  <circle cx="112" cy="158" r="3" fill="#FEF3C7" />
+
+  <!-- Neck -->
+  <path d="M90 120h20v24H90z" fill="#EBB38A" />
+
+  <!-- Head & Ears -->
+  <ellipse cx="69" cy="98" rx="5" ry="9" fill="url(#skin_ananya)" />
+  <ellipse cx="131" cy="98" rx="5" ry="9" fill="url(#skin_ananya)" />
+  <ellipse cx="100" cy="98" rx="30" ry="36" fill="url(#skin_ananya)" />
+
+  <!-- Front Hair -->
+  <path d="M66 88c0-20 14-36 34-36s34 16 34 36c-8-10-20-16-34-16s-26 6-34 16z" fill="#3E3228" />
+
+  <!-- Eyes & Friendly Expression -->
+  <path d="M81 87c3-2 7-2 10 0" fill="none" stroke="#1C1917" stroke-width="2.2" stroke-linecap="round" />
+  <path d="M109 87c3-2 7-2 10 0" fill="none" stroke="#1C1917" stroke-width="2.2" stroke-linecap="round" />
+  <circle cx="86" cy="96" r="3.2" fill="#1E293B" />
+  <circle cx="114" cy="96" r="3.2" fill="#1E293B" />
+  <circle cx="87" cy="95" r="1" fill="#FFFFFF" />
+  <circle cx="115" cy="95" r="1" fill="#FFFFFF" />
+
+  <!-- Nose & Warm Smile -->
+  <path d="M100 97v8l3 1.5" fill="none" stroke="#C88E67" stroke-width="1.8" stroke-linecap="round" />
+  <path d="M91 115c5 5 13 5 18 0" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Pediatric Bear Pin on coat -->
+  <circle cx="56" cy="168" r="5" fill="#F59E0B" />
+  <circle cx="53" cy="163" r="2" fill="#F59E0B" />
+  <circle cx="59" cy="163" r="2" fill="#F59E0B" />
+</svg>
