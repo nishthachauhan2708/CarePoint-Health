@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { Doctor, Department } from '../types';
+import { getDoctorPhoto } from '../utils/assets';
 
 export const DoctorDirectoryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -230,10 +231,14 @@ export const DoctorDirectoryPage: React.FC = () => {
                   className="bg-white rounded-2xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-lg transition-all p-6 flex flex-col justify-between group"
                 >
                   <div className="space-y-4">
-                    {/* Header info */}
+                    {/* Header info with Real Physician Portrait */}
                     <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center text-xl font-bold shadow-md shadow-teal-700/20 shrink-0">
-                        {doc.user?.full_name ? doc.user.full_name.replace('Dr. ', '').charAt(0) : 'D'}
+                      <div className="w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 shadow-sm shrink-0 bg-slate-100">
+                        <img 
+                          src={getDoctorPhoto(doc.user?.full_name, doc.specialization)} 
+                          alt={doc.user?.full_name || 'Doctor'} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 mb-0.5">

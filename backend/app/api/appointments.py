@@ -57,9 +57,11 @@ def book_appointment(
         DoctorAvailability.is_available == True
     ).first()
     if not avail:
+        doc_name = doc.user.full_name if doc.user else "Doctor"
+        formatted_name = doc_name if doc_name.startswith("Dr.") else f"Dr. {doc_name}"
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Dr. {doc.user.full_name if doc.user else 'Doctor'} is not scheduled for consultations on {day_name}s."
+            detail=f"{formatted_name} is not scheduled for consultations on {day_name}s."
         )
 
     # Prevent duplicate bookings: check if slot is already occupied

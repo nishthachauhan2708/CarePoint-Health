@@ -8,6 +8,7 @@ import {
 import { api } from '../services/api';
 import { Doctor, Appointment } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { getDoctorPhoto } from '../utils/assets';
 
 export const DoctorProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -240,8 +241,12 @@ export const DoctorProfilePage: React.FC = () => {
             {/* Primary Profile Card */}
             <div className="bg-white rounded-3xl border border-slate-200/90 p-8 shadow-sm space-y-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center text-4xl font-black shadow-lg shadow-teal-700/25 shrink-0">
-                  {doctor.user?.full_name ? doctor.user.full_name.replace('Dr. ', '').charAt(0) : 'D'}
+                <div className="w-28 h-28 rounded-3xl overflow-hidden border-2 border-teal-500/30 shadow-lg shadow-teal-700/20 shrink-0 bg-slate-100">
+                  <img 
+                    src={getDoctorPhoto(doctor.user?.full_name, doctor.specialization)} 
+                    alt={doctor.user?.full_name || 'Doctor'} 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">

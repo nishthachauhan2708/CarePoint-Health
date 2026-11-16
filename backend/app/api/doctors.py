@@ -123,12 +123,14 @@ def get_available_slots(id: int, date_str: str = Query(..., description="Format 
     ).first()
 
     if not avail:
+        doc_name = doc.user.full_name if doc.user else "Doctor"
+        formatted_name = doc_name if doc_name.startswith("Dr.") else f"Dr. {doc_name}"
         return {
             "doctor_id": id,
             "date": date_str,
             "day_of_week": day_name,
             "is_working_day": False,
-            "message": f"Dr. {doc.user.full_name if doc.user else 'Doctor'} is not scheduled for OPD consultations on {day_name}s.",
+            "message": f"{formatted_name} is not scheduled for OPD consultations on {day_name}s.",
             "slots": []
         }
 

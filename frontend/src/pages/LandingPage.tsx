@@ -4,11 +4,13 @@ import {
   Activity, Calendar, Heart, Shield, Award, Users, 
   ArrowRight, PhoneCall, Clock, CheckCircle, Search, 
   Stethoscope, Building2, ChevronRight, UserCheck, 
-  Sparkles, Star, Bed, Pill, TestTube, Microscope, HeartPulse
+  Sparkles, Star, Bed, Pill, TestTube, Microscope, HeartPulse,
+  ShieldCheck, Ambulance, FileBadge2, AlertTriangle, CalendarCheck
 } from 'lucide-react';
 import { api } from '../services/api';
 import { Department, Doctor } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { HOSPITAL_IMAGES, getDoctorPhoto } from '../utils/assets';
 
 export const LandingPage: React.FC = () => {
   const { user } = useAuth();
@@ -38,19 +40,11 @@ export const LandingPage: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleBookNow = () => {
-    if (user) {
-      if (user.role === 'patient') {
-        navigate('/dashboard/patient');
-      } else if (user.role === 'doctor') {
-        navigate('/dashboard/doctor');
-      } else if (user.role === 'admin') {
-        navigate('/dashboard/admin');
-      } else if (user.role === 'receptionist') {
-        navigate('/dashboard/receptionist');
-      }
+  const handleHeroSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/doctors?search=${encodeURIComponent(searchQuery.trim())}`);
     } else {
-      // Direct unauthenticated users to the doctors directory to browse and select
       navigate('/doctors');
     }
   };
@@ -65,441 +59,582 @@ export const LandingPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* 24/7 Emergency Header Strip */}
+    <div className="min-h-screen bg-slate-50 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
+      
+      {/* 24/7 Critical Emergency Alert Strip */}
       <section id="emergency" className="bg-rose-900 text-rose-50 px-4 py-2.5 text-xs font-medium border-b border-rose-950">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-400 animate-ping"></span>
-            <span className="font-bold uppercase tracking-wider text-rose-200">24/7 Critical Emergency Hotline:</span>
-            <span className="font-mono font-black text-white text-sm bg-rose-950/80 px-2.5 py-0.5 rounded border border-rose-700/50">+91-1800-CARE-NOW</span>
+            <span className="font-bold uppercase tracking-wider text-rose-200">24/7 Level-1 Trauma Emergency:</span>
+            <a 
+              href="tel:18002273669" 
+              className="font-mono font-black text-white text-sm bg-rose-950/80 px-2.5 py-0.5 rounded border border-rose-700/60 hover:bg-rose-800 transition-colors"
+            >
+              +91-1800-CARE-NOW
+            </a>
           </div>
           <p className="text-rose-200/90 text-[11px] text-center sm:text-right">
-            Level-1 Trauma, Acute Stroke & Cardiac Emergencies. Immediate Ambulance Dispatch with Live GPS.
+            Cardiac Arrest, Acute Stroke & Polytrauma Care. Immediate Ambulance Dispatch with Live GPS Telemetry.
           </p>
         </div>
       </section>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-teal-50/60 via-white to-slate-50 border-b border-slate-200/80 py-16 lg:py-24">
+      {/* Hero Section with Professional Medical Visual & Search Integration */}
+      <section className="relative overflow-hidden bg-white border-b border-slate-200/90 py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
-            {/* Left Column: Hospital Value Proposition */}
+            {/* Left Column: Hospital Vision & Direct Search */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-100/90 border border-teal-200 text-teal-800 text-xs font-semibold">
+              
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold shadow-sm">
                 <Sparkles className="w-4 h-4 text-teal-600" />
-                <span>Next-Generation Smart Healthcare & Hospital Operations</span>
+                <span>NABH Accredited Tertiary Healthcare & Smart Hospital Management</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
                 Better Healthcare.<br />
                 <span className="text-teal-600">Smarter Management.</span>
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-                CareHealth Point unifies patient registrations, doctor availability, real-time OPD queue telemetry, electronic consultations, digital health cards, and hospital analytics into one secure clinical ecosystem.
+                CareHealth Point unifies clinical specialist consultations, real-time OPD queue telemetry, digital health cards (UHID), e-prescriptions, and hospital operations into one robust, cloud-native platform.
               </p>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              {/* Integrated Hero Doctor Search Bar */}
+              <form onSubmit={handleHeroSearch} className="bg-slate-50 p-2 sm:p-2.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-2 max-w-xl">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="text"
+                    placeholder="Search doctor by name, specialty, or condition..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2.5 text-xs sm:text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium"
+                  />
+                </div>
                 <button
-                  onClick={handleBookNow}
-                  className="px-6 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-teal-600/25 transition-all flex items-center gap-2 group"
+                  type="submit"
+                  className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-teal-600/25 transition-all flex items-center justify-center gap-2"
                 >
-                  <Calendar className="w-4 h-4" />
-                  <span>Book Consultation Slot</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <Search className="w-4 h-4" />
+                  <span>Find Doctor</span>
                 </button>
+              </form>
 
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-4 pt-1">
                 <Link
                   to="/doctors"
-                  className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm rounded-xl border border-slate-200 shadow-sm transition-all flex items-center gap-2"
+                  className="px-6 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-teal-600/20 transition-all flex items-center gap-2 group"
                 >
-                  <Stethoscope className="w-4 h-4 text-teal-600" />
-                  <span>Browse Doctor Directory</span>
+                  <Calendar className="w-4 h-4" />
+                  <span>Browse Available Schedules</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+
+                <Link
+                  to="/login"
+                  className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm rounded-xl border border-slate-200 shadow-sm transition-all flex items-center gap-2"
+                >
+                  <UserCheck className="w-4 h-4 text-teal-600" />
+                  <span>Clinical Portals Login</span>
                 </Link>
               </div>
 
-              {/* Key Trust Stats */}
+              {/* Key Hospital Trust Statistics */}
               <div className="grid grid-cols-3 gap-6 pt-6 border-t border-slate-200/80 max-w-lg">
                 <div>
                   <div className="text-2xl sm:text-3xl font-black text-slate-900">6+</div>
-                  <div className="text-xs text-slate-500 font-medium">Core Departments</div>
+                  <div className="text-xs text-slate-500 font-semibold">Specialized Depts</div>
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-black text-slate-900">100%</div>
-                  <div className="text-xs text-slate-500 font-medium">Verified Physicians</div>
+                  <div className="text-xs text-slate-500 font-semibold">Licensed Physicians</div>
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-black text-teal-600">&lt; 15m</div>
-                  <div className="text-xs text-slate-500 font-medium">Avg OPD Queue Time</div>
+                  <div className="text-xs text-slate-500 font-semibold">Avg OPD Queue Wait</div>
                 </div>
               </div>
+
             </div>
 
-            {/* Right Column: Live Clinical Showcase Card */}
-            <div className="lg:col-span-5">
-              <div className="bg-white rounded-3xl shadow-xl border border-slate-200/90 p-6 space-y-5">
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
-                      <Stethoscope className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900 text-sm">OPD Live Queue Telemetry</h3>
-                      <p className="text-xs text-slate-500">Real-time status tracking for patients</p>
-                    </div>
+            {/* Right Column: High Quality Hospital Visual & Live Telemetry Card */}
+            <div className="lg:col-span-5 space-y-4">
+              
+              {/* Facility Photography Card with Overlay Badge */}
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
+                <img 
+                  src={HOSPITAL_IMAGES.hospitalFacility} 
+                  alt="CareHealth Point Hospital Medical Complex"
+                  className="w-full h-64 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-5">
+                  <div className="text-white space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-teal-500/80 px-2 py-0.5 rounded text-white">
+                      Tertiary Medical Center
+                    </span>
+                    <h3 className="font-extrabold text-lg text-white">Institutional Multi-Specialty Hospital</h3>
+                    <p className="text-xs text-slate-300">Level-1 Trauma Center, 6 Modular Operating Theatres, 120 ICU Beds</p>
                   </div>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                    Live System
+                </div>
+              </div>
+
+              {/* Live OPD Queue Telemetry Widget */}
+              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                    <Activity className="w-4 h-4 text-teal-600" />
+                    <span>Live OPD Queue Telemetry</span>
+                  </div>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                    Active System
                   </span>
                 </div>
 
-                {/* Queue status banner */}
-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Currently In Chamber:</span>
-                    <span className="font-bold text-slate-900">Token #02 (Dr. Aarav Sharma)</span>
-                  </div>
-                  <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div className="bg-teal-600 h-full rounded-full w-2/3 animate-pulse"></div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-slate-600">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-teal-600" /> Estimated: ~15 mins
-                    </span>
-                    <span className="font-semibold text-teal-700">Next: Token #03</span>
-                  </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-500 font-medium">Currently In Chamber:</span>
+                  <span className="font-bold text-slate-900">Token #02 (Dr. Aarav Sharma)</span>
                 </div>
 
-                {/* Digital Health Card teaser */}
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 text-white space-y-2 shadow-md">
-                  <div className="flex items-center justify-between text-xs text-slate-400">
-                    <span>CAREHEALTH DIGITAL UHID</span>
-                    <span className="font-mono text-teal-400">CHP-2026-1001</span>
-                  </div>
-                  <div className="font-bold text-base">Rohan Mehra</div>
-                  <div className="flex items-center justify-between text-xs text-slate-300 pt-1">
-                    <span>Blood Group: <strong className="text-white">B+</strong></span>
-                    <span>Emergency: <strong className="text-white">+91-9876549999</strong></span>
-                  </div>
+                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                  <div className="bg-teal-600 h-full rounded-full w-2/3 animate-pulse"></div>
                 </div>
 
-                <Link
-                  to="/doctors"
-                  className="w-full py-2.5 text-xs font-semibold bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <span>Select Doctor & Check Live Availability</span>
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
+                <div className="flex items-center justify-between text-xs text-slate-600">
+                  <span className="flex items-center gap-1 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-teal-600" /> Est. Wait: ~15 mins
+                  </span>
+                  <span className="font-bold text-teal-700">Next In Queue: Token #03</span>
+                </div>
               </div>
+
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* Hospital Clinical Services Section */}
-      <section id="services" className="py-16 bg-white border-b border-slate-200/80">
+      {/* Hospital Clinical Services & Facilities Section */}
+      <section id="services" className="py-20 bg-white border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xs uppercase tracking-widest text-teal-600 font-bold mb-2">Comprehensive Healthcare</h2>
-            <h3 className="text-3xl font-extrabold text-slate-900">Hospital Clinical Services</h3>
-            <p className="text-sm text-slate-600 mt-2">
-              End-to-end medical care combining multidisciplinary consultants, modern diagnostic laboratories, and digital patient services.
+          
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+              Clinical Excellence
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+              Hospital Services & Facilities
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+              Equipped with modern medical diagnostic infrastructure, modular surgery suites, and round-the-clock emergency departments.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                <HeartPulse className="w-6 h-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            {/* Service 1 */}
+            <div className="bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all p-7 space-y-4 group">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <HeartPulse className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-slate-900 text-base">24/7 Emergency & Trauma Care</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Round-the-clock emergency room with dedicated resuscitation bays, immediate cardiac intervention catheterization lab, and acute trauma surgeons.
+              <h3 className="font-bold text-slate-900 text-lg">24/7 Critical Emergency & Trauma</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Dedicated Level-1 resuscitation bays, emergency triage, immediate stroke thrombolysis, and cardiac catheterization lab ready 24/7.
               </p>
+              <div className="text-xs font-semibold text-rose-600 flex items-center gap-1.5 pt-2 border-t border-slate-200/60">
+                <Ambulance className="w-4 h-4" />
+                <span>Immediate Ambulance Dispatch</span>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                <Stethoscope className="w-6 h-6" />
+            {/* Service 2 */}
+            <div className="bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all p-7 space-y-4 group">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Stethoscope className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-slate-900 text-base">Specialist Outpatient Clinics</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Consultations across cardiology, neurology, pediatrics, orthopedics, oncology, and internal medicine with automated appointment scheduling.
+              <h3 className="font-bold text-slate-900 text-lg">Specialist Outpatient Clinics (OPD)</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Multidisciplinary consultations across Cardiology, Neurology, Orthopedics, Pediatrics, Oncology, and Internal Medicine with zero-wait queue tracking.
               </p>
+              <Link to="/doctors" className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 pt-2 border-t border-slate-200/60">
+                <span>View OPD Consulting Hours</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
 
-            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                <Microscope className="w-6 h-6" />
+            {/* Service 3 */}
+            <div className="bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all p-7 space-y-4 group">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Microscope className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-slate-900 text-base">Advanced Diagnostics & Pathology</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                High-resolution 3.0T MRI, 128-slice CT scans, digital ultrasound, and full clinical biochemistry labs providing fast, automated diagnostic reporting.
+              <h3 className="font-bold text-slate-900 text-lg">Advanced Radiology & Pathology</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                3.0 Tesla MRI, 128-Slice High-Resolution CT, Digital Fluoroscopy, 4D Ultrasound, and automated biochemistry analyzers for swift, verified reporting.
               </p>
+              <div className="text-xs font-semibold text-slate-500 flex items-center gap-1 pt-2 border-t border-slate-200/60">
+                <CheckCircle className="w-4 h-4 text-teal-600" />
+                <span>NABL Accredited Diagnostics</span>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                <Bed className="w-6 h-6" />
+            {/* Service 4 */}
+            <div className="bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all p-7 space-y-4 group">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Bed className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-slate-900 text-base">Inpatient & Surgical Suites</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                State-of-the-art modular operating rooms, intensive care units (ICU, CCU, NICU), and post-operative recovery rooms with continuous vital telemetry.
+              <h3 className="font-bold text-slate-900 text-lg">Modular Operating Suites & ICU</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Laminar airflow surgical theaters, laparoscopic & robotic surgery suites, dedicated coronary care (CCU), neonatal ICU (NICU), and surgical recovery units.
               </p>
+              <div className="text-xs font-semibold text-slate-500 flex items-center gap-1 pt-2 border-t border-slate-200/60">
+                <ShieldCheck className="w-4 h-4 text-teal-600" />
+                <span>HEPA Filtered Sterility Class 100</span>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                <Shield className="w-6 h-6" />
+            {/* Service 5 */}
+            <div className="bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all p-7 space-y-4 group">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <FileBadge2 className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-slate-900 text-base">Digital Health Cards & UHID</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Permanent Universal Hospital Identification (UHID) ensuring lifelong records encryption, seamless consultation history, and emergency access.
+              <h3 className="font-bold text-slate-900 text-lg">Digital Health Card & UHID</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Permanent Universal Hospital Identification ensuring lifelong medical history encryption, emergency blood group retrieval, and immediate front-desk check-in.
               </p>
+              <div className="text-xs font-semibold text-slate-500 flex items-center gap-1 pt-2 border-t border-slate-200/60">
+                <CheckCircle className="w-4 h-4 text-teal-600" />
+                <span>Instant QR-Based Patient Verification</span>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-md transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                <Pill className="w-6 h-6" />
+            {/* Service 6 */}
+            <div className="bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all p-7 space-y-4 group">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Pill className="w-7 h-7" />
               </div>
-              <h4 className="font-bold text-slate-900 text-base">Automated Hospital Pharmacy</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Direct e-prescription routing from doctor consultation rooms to our 24/7 licensed dispensary, preventing transcription errors and drug clashes.
+              <h3 className="font-bold text-slate-900 text-lg">Automated Hospital Dispensary</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Electronic prescriptions are instantly routed from doctor chambers to our 24/7 licensed pharmacy, eliminating handwriting errors and medication conflicts.
               </p>
+              <div className="text-xs font-semibold text-slate-500 flex items-center gap-1 pt-2 border-t border-slate-200/60">
+                <CheckCircle className="w-4 h-4 text-teal-600" />
+                <span>Barcoded Prescription Verification</span>
+              </div>
             </div>
+
           </div>
+
         </div>
       </section>
 
-      {/* Departments Section */}
-      <section id="departments" className="py-16 bg-slate-50 border-b border-slate-200/80">
+      {/* Hospital Departments Section */}
+      <section id="departments" className="py-20 bg-slate-50 border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xs uppercase tracking-widest text-teal-600 font-bold mb-2">Medical Specialties</h2>
-            <h3 className="text-3xl font-extrabold text-slate-900">Hospital Clinical Departments</h3>
-            <p className="text-sm text-slate-600 mt-2">Comprehensive inpatient and outpatient clinical specialties powered by modern diagnostic technologies.</p>
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+                Specialized Medicine
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
+                Centers of Clinical Excellence
+              </h2>
+              <p className="text-sm text-slate-600 mt-1">
+                Explore specialized medical departments staffed by board-certified physicians.
+              </p>
+            </div>
+
+            <Link
+              to="/doctors"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 hover:text-teal-700 bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm transition-all"
+            >
+              <span>View All Department Doctors</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {departments.map((dept) => (
               <div 
                 key={dept.id} 
-                className="p-6 rounded-2xl border border-slate-200 hover:border-teal-500/50 hover:shadow-lg transition-all group bg-white"
+                className="p-7 rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-lg transition-all group bg-white flex flex-col justify-between"
               >
-                <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Building2 className="w-6 h-6" />
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform">
+                      <Building2 className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
+                      {dept.code}
+                    </span>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg mb-2 group-hover:text-teal-600 transition-colors">
+                    {dept.name}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 mb-6 line-clamp-2 leading-relaxed">
+                    {dept.description || 'Comprehensive diagnosis, inpatient surgical management, and advanced restorative clinical care.'}
+                  </p>
                 </div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-bold text-slate-900 text-lg">{dept.name}</h4>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200">{dept.code}</span>
-                </div>
-                <p className="text-xs text-slate-600 mb-4 line-clamp-2 leading-relaxed">{dept.description}</p>
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100 text-xs">
-                  <span className="text-slate-500 font-medium">Head: {dept.head_doctor_name || 'Senior Consultant'}</span>
+
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 font-medium">Head: <strong>{dept.head_doctor_name || 'Senior Consultant'}</strong></span>
                   <Link 
                     to={`/doctors?department_id=${dept.id}`}
-                    className="font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1"
+                    className="font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1"
                   >
-                    <span>{dept.doctor_count} Doctors</span>
+                    <span>{dept.doctor_count} Specialists</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
-      {/* Featured Doctors Section */}
-      <section id="doctors" className="py-16 bg-white border-b border-slate-200/80">
+      {/* Featured Doctors Section with Real Physician Photography */}
+      <section id="doctors" className="py-20 bg-white border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
-              <h2 className="text-xs uppercase tracking-widest text-teal-600 font-bold mb-2">Clinical Staff</h2>
-              <h3 className="text-3xl font-extrabold text-slate-900">Featured Specialists & Consultants</h3>
-              <p className="text-sm text-slate-600 mt-1">Verified physicians with published consultation hours and direct slot booking.</p>
+              <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+                Medical Staff
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
+                Featured Specialists & Department Heads
+              </h2>
+              <p className="text-sm text-slate-600 mt-1">
+                Verified physicians with published weekly consulting schedules and direct slot reservation.
+              </p>
             </div>
 
-            {/* Live Filter Controls */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  type="text"
-                  placeholder="Search doctor or specialty..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 w-60 shadow-sm"
-                />
-              </div>
-
-              <select
-                value={selectedDept || ''}
-                onChange={(e) => setSelectedDept(e.target.value ? Number(e.target.value) : undefined)}
-                className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-sm text-slate-700"
-              >
-                <option value="">All Departments</option>
-                {departments.map((d) => (
-                  <option key={d.id} value={d.id}>{d.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Doctor Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredDoctors.map((doc) => (
-              <div key={doc.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group">
-                <div>
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0">
-                      {doc.user?.full_name ? doc.user.full_name.replace('Dr. ', '').charAt(0) : 'D'}
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-slate-900 text-sm truncate group-hover:text-teal-600 transition-colors">
-                        {doc.user?.full_name}
-                      </h4>
-                      <p className="text-xs text-teal-600 font-semibold truncate">{doc.specialization}</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1 text-xs text-slate-600 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <p><strong className="text-slate-800">Dept:</strong> {doc.department_name}</p>
-                    <p><strong className="text-slate-800">Experience:</strong> {doc.experience_years}+ Years</p>
-                    <p><strong className="text-slate-800">Fee:</strong> ₹{doc.consultation_fee}</p>
-                  </div>
-
-                  <p className="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed">{doc.biography}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100">
-                  <Link
-                    to={`/doctors/${doc.id}`}
-                    className="py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg text-center border border-slate-200 transition-colors"
-                  >
-                    View Bio
-                  </Link>
-                  <Link
-                    to={`/doctors/${doc.id}`}
-                    className="py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded-lg text-center transition-colors flex items-center justify-center gap-1"
-                  >
-                    <Calendar className="w-3 h-3" />
-                    <span>Book Slot</span>
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-10">
             <Link
               to="/doctors"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-md"
+              className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-md shadow-teal-600/20 transition-all flex items-center gap-2"
             >
-              <span>Explore All Hospital Doctors & Schedules</span>
+              <span>Explore All {doctors.length} Doctors</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredDoctors.slice(0, 4).map((doc) => {
+              const photo = getDoctorPhoto(doc.user?.full_name, doc.specialization);
+
+              return (
+                <div 
+                  key={doc.id} 
+                  className="bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Doctor Real Photo Banner */}
+                    <div className="relative h-56 overflow-hidden bg-slate-100">
+                      <img 
+                        src={photo} 
+                        alt={doc.user?.full_name || 'Hospital Doctor'} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-slate-800 shadow-sm flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3 text-teal-600" />
+                        <span>Verified</span>
+                      </div>
+                      <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-2.5 py-0.5 rounded-md text-[10px] font-mono text-teal-300">
+                        {doc.license_number}
+                      </div>
+                    </div>
+
+                    <div className="p-5 space-y-3">
+                      <div>
+                        <span className="text-[11px] font-bold text-teal-700 uppercase tracking-wider block">
+                          {doc.department_name}
+                        </span>
+                        <h3 className="font-extrabold text-slate-900 text-base group-hover:text-teal-600 transition-colors">
+                          {doc.user?.full_name}
+                        </h3>
+                        <p className="text-xs text-slate-500 font-medium">
+                          {doc.specialization}
+                        </p>
+                      </div>
+
+                      <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Degree:</span>
+                          <span className="font-semibold text-slate-800">{doc.qualification}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Experience:</span>
+                          <span className="font-semibold text-slate-800">{doc.experience_years}+ Years</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Consultation:</span>
+                          <span className="font-bold text-teal-700">₹{doc.consultation_fee}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                        {doc.biography}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-5 pt-0 grid grid-cols-2 gap-2">
+                    <Link
+                      to={`/doctors/${doc.id}`}
+                      className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl text-center transition-colors"
+                    >
+                      View Profile
+                    </Link>
+                    <Link
+                      to={`/doctors/${doc.id}`}
+                      className="py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl text-center shadow-sm transition-colors flex items-center justify-center gap-1"
+                    >
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>Book Slot</span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-16 bg-slate-50 border-b border-slate-200/80">
+      {/* Why Choose CareHealth Point Section */}
+      <section id="why-us" className="py-20 bg-slate-50 border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xs uppercase tracking-widest text-teal-600 font-bold mb-2">Clinical Quality</h2>
-            <h3 className="text-3xl font-extrabold text-slate-900">Why Patients Trust CareHealth Point</h3>
+          
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+              Institutional Quality
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+              Why Patients Trust CareHealth Point
+            </h2>
+            <p className="text-sm text-slate-600">
+              Transforming patient experience through cloud-native queue telemetry, zero paperwork, and verified specialists.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <Clock className="w-8 h-8 text-teal-600 mb-3" />
-              <h4 className="font-bold text-slate-900 text-sm mb-1">Zero-Wait OPD Queue</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">Live queue wait-time tracking so patients know exact consultation status before arriving.</p>
+            
+            <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-base">Zero-Wait OPD Queue</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Live queue wait-time telemetry lets patients arrive right on time, preventing crowded waiting lounges.
+              </p>
             </div>
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <Shield className="w-8 h-8 text-teal-600 mb-3" />
-              <h4 className="font-bold text-slate-900 text-sm mb-1">Encrypted Health Records</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">Tamper-evident prescriptions, diagnostic history, and patient confidentiality protected by RBAC.</p>
+
+            <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                <Shield className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-base">Encrypted Health Vault</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Tamper-evident prescriptions, consultation notes, and health records protected by strict role-based access controls.
+              </p>
             </div>
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <Award className="w-8 h-8 text-teal-600 mb-3" />
-              <h4 className="font-bold text-slate-900 text-sm mb-1">Board-Certified Specialists</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">Verified medical credentials, senior department heads, and evidence-based protocols.</p>
+
+            <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                <Award className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-base">Board-Certified Doctors</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Every physician holds verified credentials from medical councils with transparent consultation fees and schedules.
+              </p>
             </div>
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-              <PhoneCall className="w-8 h-8 text-teal-600 mb-3" />
-              <h4 className="font-bold text-slate-900 text-sm mb-1">24/7 Rapid Emergency</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">Level-1 trauma center, round-the-clock cardiac interventions, and intensive care readiness.</p>
+
+            <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                <Ambulance className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-base">24/7 Rapid Trauma Care</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Immediate Level-1 trauma resuscitation, cardiac catheterization, and round-the-clock emergency surgical readiness.
+              </p>
             </div>
+
           </div>
+
         </div>
       </section>
 
       {/* Patient Testimonials Section (Demonstration Data) */}
-      <section className="py-16 bg-white border-b border-slate-200/80">
+      <section className="py-20 bg-white border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold mb-2">
+          
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold">
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              <span>Sample Patient Testimonials (Demonstration Content)</span>
+              <span>Sample Patient Testimonials (Demonstration Content for Viva Evaluation)</span>
             </div>
-            <h3 className="text-3xl font-extrabold text-slate-900">Patient Experiences & Feedback</h3>
-            <p className="text-sm text-slate-600 mt-2">
-              Demonstrating how CareHealth Point streamlines the OPD waiting journey and clinical consultations.
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+              Patient Experiences & Care Feedback
+            </h2>
+            <p className="text-sm text-slate-600">
+              Demonstrating how CareHealth Point streamlines outpatient visits and electronic consultations.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200/90 space-y-4 shadow-sm">
               <div className="flex items-center gap-1 text-amber-500">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-500" />
                 ))}
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed italic">
-                "The live OPD queue number saved me over two hours of sitting in the hospital waiting room. I could monitor token progression in real-time from my phone."
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
+                "The live OPD queue number saved me over two hours of sitting in the waiting area. I could track my token progression in real time from my phone before walking in."
               </p>
-              <div className="pt-2 border-t border-slate-200/60">
-                <span className="font-bold text-slate-900 text-xs block">Rohan M.</span>
-                <span className="text-[11px] text-slate-400">Cardiology Outpatient Patient</span>
+              <div className="pt-4 border-t border-slate-200/60">
+                <span className="font-bold text-slate-900 text-sm block">Rohan Mehra</span>
+                <span className="text-xs text-slate-400">Cardiology Outpatient Patient (UHID: CHP-2026-1001)</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200/90 space-y-4 shadow-sm">
               <div className="flex items-center gap-1 text-amber-500">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-500" />
                 ))}
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed italic">
-                "Having my Digital Health Card and UHID instantly accessible meant the front desk checked me in within seconds. Dr. Priya Nair's consultation was exceptional."
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
+                "Having my Digital Health Card and UHID saved on my phone meant the front desk checked me in within 15 seconds. Dr. Priya Nair's consultation was prompt and detailed."
               </p>
-              <div className="pt-2 border-t border-slate-200/60">
-                <span className="font-bold text-slate-900 text-xs block">Anita S.</span>
-                <span className="text-[11px] text-slate-400">Neurology Consultation</span>
+              <div className="pt-4 border-t border-slate-200/60">
+                <span className="font-bold text-slate-900 text-sm block">Anita Sharma</span>
+                <span className="text-xs text-slate-400">Neurology Consultation (UHID: CHP-2026-1002)</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200/90 space-y-4 shadow-sm">
               <div className="flex items-center gap-1 text-amber-500">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-amber-500" />
                 ))}
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed italic">
-                "Direct prescription syncing with the hospital dispensary was effortless. The medicine instructions and dosages were clearly marked in my patient portal."
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
+                "Direct prescription syncing with the hospital pharmacy made picking up prescribed medicines seamless. The dosage instructions were clearly visible in my patient dashboard."
               </p>
-              <div className="pt-2 border-t border-slate-200/60">
-                <span className="font-bold text-slate-900 text-xs block">Vikram K.</span>
-                <span className="text-[11px] text-slate-400">Internal Medicine Routine Checkup</span>
+              <div className="pt-4 border-t border-slate-200/60">
+                <span className="font-bold text-slate-900 text-sm block">Vikram Kapoor</span>
+                <span className="text-xs text-slate-400">Internal Medicine Routine Checkup</span>
               </div>
             </div>
+
           </div>
+
         </div>
       </section>
 
