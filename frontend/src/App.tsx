@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
+import { CareBuddyChatbot } from './components/chatbot/CareBuddyChatbot';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 import { LandingPage } from './pages/LandingPage';
@@ -53,6 +54,7 @@ export const App: React.FC = () => {
             </Routes>
           </div>
 
+          <CareBuddyChatbot />
           <Footer />
         </div>
       </Router>

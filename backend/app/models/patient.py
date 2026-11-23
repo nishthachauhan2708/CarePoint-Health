@@ -8,8 +8,8 @@ class Patient(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
     patient_uhid = Column(String(30), unique=True, index=True, nullable=False)
-    date_of_birth = Column(Date, nullable=False)
-    gender = Column(String(20), nullable=False)  # Male, Female, Other
+    date_of_birth = Column(Date, nullable=True)
+    gender = Column(String(20), nullable=True)  # Male, Female, Other, Prefer not to say
     blood_group = Column(String(10), nullable=True)
     emergency_contact_name = Column(String(150), nullable=True)
     emergency_contact_phone = Column(String(20), nullable=True)

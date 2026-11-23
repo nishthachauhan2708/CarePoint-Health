@@ -65,7 +65,7 @@ export const Navbar: React.FC = () => {
               {isDemoDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-60 bg-white text-slate-800 border border-slate-200 rounded-xl shadow-2xl py-2 z-50">
                   <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 flex items-center justify-between">
-                    <span>Viva & Testing Accounts</span>
+                    <span>Clinical Role Switcher</span>
                     <Sparkles className="w-3 h-3 text-teal-600" />
                   </div>
                   <button 

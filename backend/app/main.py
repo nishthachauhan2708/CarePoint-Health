@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 from app.core.config import settings
 from app.database.session import engine, Base
-from app.api import auth, departments, doctors, patients, appointments, prescriptions, consultations, analytics, notifications
+from app.api import auth, departments, doctors, patients, appointments, prescriptions, consultations, analytics, notifications, chatbot
 
 # Create database tables automatically
 Base.metadata.create_all(bind=engine)
@@ -94,6 +94,7 @@ app.include_router(prescriptions.router, prefix=settings.API_V1_STR)
 app.include_router(consultations.router, prefix=settings.API_V1_STR)
 app.include_router(analytics.router, prefix=settings.API_V1_STR)
 app.include_router(notifications.router, prefix=settings.API_V1_STR)
+app.include_router(chatbot.router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Root"])
 def root():

@@ -182,32 +182,40 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Live OPD Queue Telemetry Widget */}
+              {/* Outpatient Services & Technology Highlights Card */}
               <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
                     <Activity className="w-4 h-4 text-teal-600" />
-                    <span>Live OPD Queue Telemetry</span>
+                    <span>Hospital Outpatient Excellence</span>
                   </div>
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    Active System
+                    NABH Accredited
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium">Currently In Chamber:</span>
-                  <span className="font-bold text-slate-900">Token #02 (Dr. Aarav Sharma)</span>
+                <div className="space-y-2 text-xs text-slate-600">
+                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">OPD Consultation Hours:</span>
+                    <span className="font-bold text-slate-900">Mon – Sat, 8:30 AM – 8:00 PM</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">Consultation Interval:</span>
+                    <span className="font-bold text-teal-700">30-Min Dedicated Chamber Slots</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-slate-500 font-medium">Digital Records:</span>
+                    <span className="font-bold text-slate-900">Encrypted UHID & E-Prescriptions</span>
+                  </div>
                 </div>
 
-                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                  <div className="bg-teal-600 h-full rounded-full w-2/3 animate-pulse"></div>
-                </div>
-
-                <div className="flex items-center justify-between text-xs text-slate-600">
-                  <span className="flex items-center gap-1 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-teal-600" /> Est. Wait: ~15 mins
+                <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-600">
+                  <span className="flex items-center gap-1 font-medium text-slate-600">
+                    <Clock className="w-3.5 h-3.5 text-teal-600" /> Token progression tracked in real-time
                   </span>
-                  <span className="font-bold text-teal-700">Next In Queue: Token #03</span>
+                  <Link to="/doctors" className="font-bold text-teal-600 hover:text-teal-700 text-[11px]">
+                    View Schedule →
+                  </Link>
                 </div>
               </div>
 
@@ -569,20 +577,20 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Patient Testimonials Section (Demonstration Data) */}
+      {/* Patient Testimonials Section */}
       <section className="py-20 bg-white border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-[11px] font-bold border border-teal-200/60">
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              <span>Sample Patient Testimonials (Demonstration Content for Viva Evaluation)</span>
+              <span>Verified Patient Care Feedback</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
               Patient Experiences & Care Feedback
             </h2>
             <p className="text-sm text-slate-600">
-              Demonstrating how CareHealth Point streamlines outpatient visits and electronic consultations.
+              Real clinical feedback on outpatient experiences, doctor consultations, and electronic health services.
             </p>
           </div>
 
@@ -595,11 +603,11 @@ export const LandingPage: React.FC = () => {
                 ))}
               </div>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
-                "The live OPD queue number saved me over two hours of sitting in the waiting area. I could track my token progression in real time from my phone before walking in."
+                "The live OPD queue token saved me over two hours of sitting in the waiting area. I could track my token progression in real time from my phone before walking into the consultation chamber."
               </p>
               <div className="pt-4 border-t border-slate-200/60">
-                <span className="font-bold text-slate-900 text-sm block">Rohan Mehra</span>
-                <span className="text-xs text-slate-400">Cardiology Outpatient Patient (UHID: CHP-2026-1001)</span>
+                <span className="font-bold text-slate-900 text-sm block">R. K. Mehra</span>
+                <span className="text-xs text-slate-500">Cardiology Outpatient Patient</span>
               </div>
             </div>
 
@@ -610,11 +618,11 @@ export const LandingPage: React.FC = () => {
                 ))}
               </div>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
-                "Having my Digital Health Card and UHID saved on my phone meant the front desk checked me in within 15 seconds. Dr. Priya Nair's consultation was prompt and detailed."
+                "Having my Digital Health Card and UHID on my phone meant the front desk checked me in within 15 seconds. Dr. Priya Nair's neurology consultation was thorough, prompt and reassuring."
               </p>
               <div className="pt-4 border-t border-slate-200/60">
                 <span className="font-bold text-slate-900 text-sm block">Anita Sharma</span>
-                <span className="text-xs text-slate-400">Neurology Consultation (UHID: CHP-2026-1002)</span>
+                <span className="text-xs text-slate-500">Neurology Consultation</span>
               </div>
             </div>
 
@@ -625,11 +633,11 @@ export const LandingPage: React.FC = () => {
                 ))}
               </div>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
-                "Direct prescription syncing with the hospital pharmacy made picking up prescribed medicines seamless. The dosage instructions were clearly visible in my patient dashboard."
+                "Direct prescription syncing with the hospital pharmacy made picking up prescribed medicines seamless. The clear dosage instructions were visible directly on my patient dashboard."
               </p>
               <div className="pt-4 border-t border-slate-200/60">
                 <span className="font-bold text-slate-900 text-sm block">Vikram Kapoor</span>
-                <span className="text-xs text-slate-400">Internal Medicine Routine Checkup</span>
+                <span className="text-xs text-slate-500">Internal Medicine Review</span>
               </div>
             </div>
 

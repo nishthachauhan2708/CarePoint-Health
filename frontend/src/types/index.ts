@@ -66,12 +66,14 @@ export interface DigitalHealthCard {
   email: string;
   phone?: string;
   blood_group?: string;
-  gender: string;
-  dob: string;
+  gender?: string;
+  dob?: string;
+  address?: string;
   allergies?: string;
   emergency_contact?: string;
   emergency_phone?: string;
   total_visits: number;
+  verification_url?: string;
 }
 
 export type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';

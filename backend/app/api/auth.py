@@ -26,7 +26,6 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         )
     
     # Public registration is strictly for patient role to prevent unauthorized privilege escalation
-    # Admin, Doctor, and Receptionist accounts are created through administrative provisioning or seeds
     assigned_role = "patient"
 
     clean_full_name = user_in.full_name.strip()
@@ -51,15 +50,20 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         if not db.query(Patient).filter(Patient.patient_uhid == uhid).first():
             break
 
+    # Store exact registration details provided by patient without fabricated defaults
+    clean_gender = user_in.gender.strip() if user_in.gender and user_in.gender.strip() else None
+    clean_blood = user_in.blood_group.strip() if user_in.blood_group and user_in.blood_group.strip() else None
+    clean_address = user_in.address.strip() if user_in.address and user_in.address.strip() else None
+
     patient = Patient(
         user_id=user.id,
         patient_uhid=uhid,
-        date_of_birth=date(1995, 1, 1),
-        gender="Not Specified",
-        blood_group="O+",
-        emergency_contact_name="Emergency Contact",
-        emergency_contact_phone=clean_phone or "9876543210",
-        address="New Delhi, India"
+        date_of_birth=user_in.date_of_birth,
+        gender=clean_gender,
+        blood_group=clean_blood,
+        emergency_contact_name=None,
+        emergency_contact_phone=None,
+        address=clean_address
     )
     db.add(patient)
     db.commit()
@@ -110,14 +114,17 @@ def get_current_user_profile(current_user: User = Depends(get_current_user), db:
     }
 
     if current_user.role == "patient" and current_user.patient_profile:
+        p = current_user.patient_profile
         profile_data["patient"] = {
-            "id": current_user.patient_profile.id,
-            "patient_uhid": current_user.patient_profile.patient_uhid,
-            "blood_group": current_user.patient_profile.blood_group,
-            "date_of_birth": current_user.patient_profile.date_of_birth,
-            "gender": current_user.patient_profile.gender,
-            "emergency_contact_phone": current_user.patient_profile.emergency_contact_phone,
-            "allergies": current_user.patient_profile.allergies
+            "id": p.id,
+            "patient_uhid": p.patient_uhid,
+            "blood_group": p.blood_group,
+            "date_of_birth": p.date_of_birth,
+            "gender": p.gender,
+            "address": p.address,
+            "emergency_contact_phone": p.emergency_contact_phone,
+            "emergency_contact_name": p.emergency_contact_name,
+            "allergies": p.allergies
         }
     elif current_user.role == "doctor" and current_user.doctor_profile:
         profile_data["doctor"] = {

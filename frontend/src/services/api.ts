@@ -48,7 +48,7 @@ export const api = {
       const res = await apiClient.post('/auth/login', { email, password });
       return res.data;
     },
-    register: async (userData: { email: string; password: string; full_name: string; role?: string; phone_number?: string }) => {
+    register: async (userData: { email: string; password: string; full_name: string; role?: string; phone_number?: string; date_of_birth?: string; gender?: string; blood_group?: string; address?: string }) => {
       const res = await apiClient.post('/auth/register', userData);
       return res.data;
     },
@@ -126,6 +126,22 @@ export const api = {
     },
     update: async (id: number, data: Partial<Patient>): Promise<Patient> => {
       const res = await apiClient.put(`/patients/${id}`, data);
+      return res.data;
+    },
+    updateMyProfile: async (data: any): Promise<Patient> => {
+      const res = await apiClient.put('/patients/me/profile', data);
+      return res.data;
+    },
+    verifyCard: async (uhid: string) => {
+      const res = await apiClient.get(`/patients/verify-card/${uhid}`);
+      return res.data;
+    },
+  },
+
+  // Chatbot (Care Buddy)
+  chatbot: {
+    sendMessage: async (message: string, sessionId?: string) => {
+      const res = await apiClient.post('/chatbot/message', { message, session_id: sessionId });
       return res.data;
     },
   },
