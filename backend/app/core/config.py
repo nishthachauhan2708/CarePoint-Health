@@ -24,12 +24,13 @@ class Settings:
 
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-        "*"
-    ]
+    origin.strip()
+    for origin in os.getenv(
+        "BACKEND_CORS_ORIGINS",
+        "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173"
+    ).split(",")
+    if origin.strip()
+]
 
     def __init__(self):
         insecure_keys = [
