@@ -9,7 +9,7 @@ export const Footer: React.FC = () => {
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
-          
+
           {/* Brand & Hospital Overview */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center space-x-2.5 text-white">
@@ -96,19 +96,18 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="text-xs font-bold text-rose-400 tracking-widest uppercase mb-4 flex items-center gap-1.5">
               <ShieldAlert className="w-4 h-4 text-rose-500" />
-              <span>24/7 Trauma Care</span>
+              <span>Trauma Care (Demo)</span>
             </h4>
-            
+
             <div className="p-3.5 bg-rose-950/40 border border-rose-800/60 rounded-2xl mb-3 space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-300 block">Emergency Ambulance</span>
-              <a 
-                href="tel:18002273669" 
-                className="flex items-center gap-2 text-white font-extrabold text-sm hover:text-rose-300 transition-colors"
+              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-300 block">Emergency Helpline (Simulated)</span>
+              <div
+                className="flex items-center gap-2 text-white font-extrabold text-sm select-none cursor-default"
               >
                 <PhoneCall className="w-4 h-4 text-rose-400 animate-pulse" />
                 <span>+91-1800-CARE-NOW</span>
-              </a>
-              <p className="text-[10px] text-rose-300/80">Immediate cardiac & trauma resuscitation triage</p>
+              </div>
+              <p className="text-[10px] text-rose-300/80">Simulated demonstration contact • For real emergencies dial 112</p>
             </div>
 
             <div className="text-xs text-slate-400 space-y-1.5 pt-1">
@@ -128,17 +127,17 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar: Copyright & Compliance */}
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
           <p>© 2026 CareHealth Point Hospitals & Research Institute. All rights reserved.</p>
-          
+
           <div className="flex items-center gap-4 text-xs text-slate-400">
-            <button 
-              onClick={() => setModalType('privacy')} 
+            <button
+              onClick={() => setModalType('privacy')}
               className="hover:text-teal-400 transition-colors"
             >
               Privacy Policy
             </button>
             <span className="text-slate-700">|</span>
-            <button 
-              onClick={() => setModalType('terms')} 
+            <button
+              onClick={() => setModalType('terms')}
               className="hover:text-teal-400 transition-colors"
             >
               Terms of Clinical Service
@@ -162,7 +161,7 @@ export const Footer: React.FC = () => {
                   {modalType === 'privacy' ? 'Patient Data Privacy Policy' : 'Terms of Clinical Service'}
                 </h3>
               </div>
-              <button 
+              <button
                 onClick={() => setModalType(null)}
                 className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
               >

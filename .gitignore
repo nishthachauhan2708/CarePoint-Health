@@ -59,3 +59,5 @@ frontend/dist-ssr/
 # Docker / Kubernetes
 *.log
 docker-compose.override.yml
+kubernetes/base/secret.yaml
+ansible/inventory/group_vars/all.yml

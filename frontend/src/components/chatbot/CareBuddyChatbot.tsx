@@ -199,7 +199,7 @@ export const CareBuddyChatbot: React.FC = () => {
           {/* Safety Notice Banner */}
           <div className="bg-amber-50/90 border-b border-amber-200/70 px-3 py-1.5 text-[10px] text-amber-800 flex items-center gap-1.5">
             <ShieldAlert className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-            <span>Hospital Guide. For 24/7 emergencies, dial <strong>+91-1800-CARE-NOW</strong>.</span>
+            <span>Hospital Guide. Simulated Demo Hotline: <strong>+91-1800-CARE-NOW</strong> (For real emergencies call 112).</span>
           </div>
 
           {/* Messages Body */}

@@ -1,0 +1,27 @@
+---
+# CareHealth Point Global Automation Variables Template
+# Course: DevOps & Automation Lab (ENSP461)
+# Note: For production secrets, use Ansible Vault:
+#       ansible-vault encrypt ansible/inventory/group_vars/all.yml
+#       Or keep sensitive passwords in a separate vault file (e.g. vault.yml).
+app_name: carehealth-point
+app_version: 1.0.0
+app_env: production
+install_dir: /opt/carehealth-point
+
+# Docker Configuration
+docker_users:
+  - ubuntu
+  - jenkins
+
+# Kubernetes Configuration
+k8s_namespace: carehealth
+minikube_driver: docker
+minikube_cpus: 4
+minikube_memory: 8192
+
+# Database Settings
+db_user: carehealth_admin
+db_name: carehealth_db
+# In production, replace with vault-encrypted variable, e.g. db_password: "{{ vault_db_password }}"
+db_password: "CHANGE_ME_TO_A_STRONG_DATABASE_PASSWORD"

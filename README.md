@@ -5,12 +5,15 @@
 [![GitOps](https://img.shields.io/badge/GitOps-ArgoCD%20Sync-EF7B4D?logo=argo)](./kubernetes/argocd)
 [![Monitoring](https://img.shields.io/badge/Observability-Prometheus%20%2B%20Grafana-E6522C?logo=prometheus)](./monitoring)
 [![Security](https://img.shields.io/badge/DevSecOps-SonarQube%20%2B%20Trivy-4E9BCD?logo=sonarqube)](./security)
-[![Tests Passing](https://img.shields.io/badge/Tests-10%2F10%20Passing-brightgreen?logo=pytest)](./backend/tests)
+[![Tests Passing](https://img.shields.io/badge/Tests-29%2F29%20Passing-brightgreen?logo=pytest)](./backend/tests)
 
-> **Course:** DevOps & Automation Lab  
-> **Course Code:** ENSP461  
-> **Project Title:** Design and Implementation of an End-to-End DevOps Pipeline for Cloud-Native Application Deployment  
+> **Course:** DevOps & Automation Lab
+> **Course Code:** ENSP461
+> **Project Title:** Design and Implementation of an End-to-End DevOps Pipeline for Cloud-Native Application Deployment
 > **Tagline:** *Better Healthcare. Smarter Management.*
+
+> ⚠️ **ACADEMIC DEMONSTRATION DISCLAIMER:**
+> CareHealth Point is an educational, capstone project developed for university laboratory evaluation. All hospital contact details, emergency phone numbers (`+91-1800-CARE-NOW`), facility addresses, patient profiles, doctor records, operational notices, and clinical metrics are **simulated demonstration placeholders**. For actual medical emergencies, always contact verified national emergency services (112 / 108 / 911).
 
 ---
 
@@ -180,6 +183,9 @@ users (id, email, hashed_password, full_name, role, phone_number, is_active, cre
 ---
 
 ## 8. Demo Accounts & Credentials
+
+> 🔒 **SECURITY & EVALUATION NOTICE:**
+> The credentials below are pre-configured strictly for university laboratory evaluation, academic viva, and local feature demonstration. They are seeded into development environments to allow evaluators to inspect all 4 role portals. **Never deploy or reuse these default credentials in public production environments.** In production deployments, disable the 1-click persona switcher by setting `VITE_ENABLE_DEMO_LOGIN=false`.
 
 For academic evaluations, university viva examinations, and live demonstrations, use the pre-configured accounts:
 
@@ -465,7 +471,7 @@ ArgoCD maintains the desired cluster state declared in Git:
 kubectl apply -f kubernetes/monitoring/prometheus-grafana.yaml
 ```
 - **Prometheus Dashboard:** [http://localhost:30090](http://localhost:30090)
-- **Grafana Operational Dashboard:** [http://localhost:30030](http://localhost:30030) (Credentials: `admin` / `CareHealthGrafana@2026`)
+- **Grafana Operational Dashboard:** [http://localhost:30030](http://localhost:30030) (Default dev credentials configured via environment / Kubernetes secret: `admin` / see `.env.example`)
 
 ### Monitored Metrics
 - `carehealth_http_requests_total`: Total HTTP requests partitioned by HTTP method, route, and status code.

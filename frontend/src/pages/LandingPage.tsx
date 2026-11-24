@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Activity, Calendar, Heart, Shield, Award, Users, 
-  ArrowRight, PhoneCall, Clock, CheckCircle, Search, 
-  Stethoscope, Building2, ChevronRight, UserCheck, 
+import {
+  Activity, Calendar, Heart, Shield, Award, Users,
+  ArrowRight, PhoneCall, Clock, CheckCircle, Search,
+  Stethoscope, Building2, ChevronRight, UserCheck,
   Sparkles, Star, Bed, Pill, TestTube, Microscope, HeartPulse,
   ShieldCheck, Ambulance, FileBadge2, AlertTriangle, CalendarCheck,
   Bot, MessageSquare, Zap, Check, ArrowUpRight
@@ -52,8 +52,8 @@ export const LandingPage: React.FC = () => {
 
   const filteredDoctors = doctors.filter(doc => {
     const matchesDept = selectedDept ? doc.department_id === selectedDept : true;
-    const matchesSearch = searchQuery 
-      ? (doc.user?.full_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = searchQuery
+      ? (doc.user?.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
          doc.specialization.toLowerCase().includes(searchQuery.toLowerCase()))
       : true;
     return matchesDept && matchesSearch;
@@ -61,22 +61,21 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
-      
+
       {/* 24/7 Critical Emergency Alert Strip */}
       <section id="emergency" className="bg-rose-950 text-rose-100 px-4 py-2.5 text-xs font-medium border-b border-rose-900 select-none">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
-            <span className="font-bold uppercase tracking-wider text-rose-300">24/7 Level-1 Trauma Emergency:</span>
-            <a 
-              href="tel:18002273669" 
-              className="font-mono font-black text-white text-xs sm:text-sm bg-rose-900/90 px-2.5 py-0.5 rounded border border-rose-700/60 hover:bg-rose-800 transition-colors"
+            <span className="font-bold uppercase tracking-wider text-rose-300">24/7 Trauma Helpline (Simulated Demo):</span>
+            <span
+              className="font-mono font-black text-white text-xs sm:text-sm bg-rose-900/90 px-2.5 py-0.5 rounded border border-rose-700/60 select-none cursor-default"
             >
               +91-1800-CARE-NOW
-            </a>
+            </span>
           </div>
           <p className="text-rose-200/90 text-[11px] text-center sm:text-right">
-            Level-1 Resuscitation Bays, Acute Stroke Unit & Cardiac Catheterization Ready. Immediate Ambulance Dispatch.
+            Academic Demonstration Project • For real medical emergencies, please dial 112 / 108.
           </p>
         </div>
       </section>
@@ -88,10 +87,10 @@ export const LandingPage: React.FC = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            
+
             {/* Left Column: Hospital Value Proposition, Tagline, Heading, Quote & Quick Search */}
             <div className="lg:col-span-7 space-y-6">
-              
+
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold shadow-xs">
                 <Sparkles className="w-4 h-4 text-teal-600" />
                 <span>NABH & JCI Accredited Multispecialty Tertiary Hospital</span>
@@ -181,11 +180,11 @@ export const LandingPage: React.FC = () => {
 
             {/* Right Column: Realistic Healthcare Photography Composition */}
             <div className="lg:col-span-5 space-y-4">
-              
+
               {/* Primary Realistic Hospital Photograph */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/90 group bg-slate-100">
-                <img 
-                  src={HOSPITAL_IMAGES.heroBanner} 
+                <img
+                  src={HOSPITAL_IMAGES.heroBanner}
                   alt="CareHealth Point Multispecialty Hospital Modern Facility and Reception"
                   className="w-full h-80 sm:h-96 lg:h-[440px] object-cover group-hover:scale-102 transition-transform duration-500"
                   loading="eager"
@@ -226,13 +225,13 @@ export const LandingPage: React.FC = () => {
       <section id="about" className="py-20 bg-slate-50 border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             {/* Visual Grid: Real Physician Examination & Modern Facility */}
             <div className="lg:col-span-6 grid grid-cols-2 gap-4">
               <div className="space-y-4">
-                <img 
-                  src={HOSPITAL_IMAGES.doctorConsulting} 
-                  alt="Doctor consulting patient" 
+                <img
+                  src={HOSPITAL_IMAGES.doctorConsulting}
+                  alt="Doctor consulting patient"
                   className="rounded-3xl shadow-lg border border-slate-200 object-cover h-64 w-full"
                 />
                 <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1">
@@ -249,9 +248,9 @@ export const LandingPage: React.FC = () => {
                   <p className="text-xs font-bold">Accredited Quality</p>
                   <p className="text-[11px] text-teal-100">National standards in clinical safety and patient privacy</p>
                 </div>
-                <img 
-                  src={HOSPITAL_IMAGES.corridor} 
-                  alt="Clean modern hospital corridor" 
+                <img
+                  src={HOSPITAL_IMAGES.corridor}
+                  alt="Clean modern hospital corridor"
                   className="rounded-3xl shadow-lg border border-slate-200 object-cover h-64 w-full"
                 />
               </div>
@@ -319,7 +318,7 @@ export const LandingPage: React.FC = () => {
       {/* 3. OUR HEALTHCARE SERVICES & FACILITIES (PHOTO CARDS) */}
       <section id="services" className="py-20 bg-white border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
               Clinical Excellence
@@ -333,13 +332,13 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
+
             {/* Service 1: 24/7 Emergency */}
             <div className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group">
               <div>
-                <img 
-                  src={HOSPITAL_IMAGES.emergencyAmbulance} 
-                  alt="Emergency Trauma Care" 
+                <img
+                  src={HOSPITAL_IMAGES.emergencyAmbulance}
+                  alt="Emergency Trauma Care"
                   className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="p-6 space-y-2">
@@ -353,7 +352,7 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
               <div className="p-6 pt-0 border-t border-slate-200/60 mt-3 flex items-center justify-between text-xs">
-                <span className="font-mono font-bold text-rose-600">+91-1800-CARE-NOW</span>
+                <span className="font-mono font-bold text-rose-600">+91-1800-CARE-NOW <span className="text-[10px] text-slate-400 font-sans font-normal">(Demo)</span></span>
                 <span className="text-slate-400 font-semibold">Immediate Dispatch</span>
               </div>
             </div>
@@ -361,9 +360,9 @@ export const LandingPage: React.FC = () => {
             {/* Service 2: Outpatient Clinics */}
             <div className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group">
               <div>
-                <img 
-                  src={HOSPITAL_IMAGES.doctorConsulting} 
-                  alt="Specialist Outpatient Clinics" 
+                <img
+                  src={HOSPITAL_IMAGES.doctorConsulting}
+                  alt="Specialist Outpatient Clinics"
                   className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="p-6 space-y-2">
@@ -388,9 +387,9 @@ export const LandingPage: React.FC = () => {
             {/* Service 3: Radiology & Diagnostics */}
             <div className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group">
               <div>
-                <img 
-                  src={HOSPITAL_IMAGES.diagnosticImaging} 
-                  alt="Advanced Radiology & MRI" 
+                <img
+                  src={HOSPITAL_IMAGES.diagnosticImaging}
+                  alt="Advanced Radiology & MRI"
                   className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="p-6 space-y-2">
@@ -412,9 +411,9 @@ export const LandingPage: React.FC = () => {
             {/* Service 4: Modular Operating Theatres */}
             <div className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group">
               <div>
-                <img 
-                  src={HOSPITAL_IMAGES.operatingTheater} 
-                  alt="Modular Operating Suites" 
+                <img
+                  src={HOSPITAL_IMAGES.operatingTheater}
+                  alt="Modular Operating Suites"
                   className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="p-6 space-y-2">
@@ -436,9 +435,9 @@ export const LandingPage: React.FC = () => {
             {/* Service 5: Digital Health Card */}
             <div className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group">
               <div>
-                <img 
-                  src={HOSPITAL_IMAGES.patientCare} 
-                  alt="Digital Health Identification" 
+                <img
+                  src={HOSPITAL_IMAGES.patientCare}
+                  alt="Digital Health Identification"
                   className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="p-6 space-y-2">
@@ -462,9 +461,9 @@ export const LandingPage: React.FC = () => {
             {/* Service 6: Automated Dispensary */}
             <div className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group">
               <div>
-                <img 
-                  src={HOSPITAL_IMAGES.laboratory} 
-                  alt="Automated Hospital Pharmacy" 
+                <img
+                  src={HOSPITAL_IMAGES.laboratory}
+                  alt="Automated Hospital Pharmacy"
                   className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="p-6 space-y-2">
@@ -491,7 +490,7 @@ export const LandingPage: React.FC = () => {
       {/* 4. DEPARTMENTS & SPECIALIZATIONS */}
       <section id="departments" className="py-20 bg-slate-50 border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
@@ -516,8 +515,8 @@ export const LandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {departments.map((dept) => (
-              <div 
-                key={dept.id} 
+              <div
+                key={dept.id}
                 className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-teal-500/40 transition-all space-y-4"
               >
                 <div className="flex items-center justify-between">
@@ -538,7 +537,7 @@ export const LandingPage: React.FC = () => {
 
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                   <span className="text-slate-600">Head: <strong>{dept.head_doctor_name || 'Senior Consultant'}</strong></span>
-                  <Link 
+                  <Link
                     to={`/doctors?specialization=${encodeURIComponent(dept.name)}`}
                     className="font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1"
                   >
@@ -556,7 +555,7 @@ export const LandingPage: React.FC = () => {
       {/* 5. FEATURED DOCTORS SECTION */}
       <section id="doctors" className="py-20 bg-white border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
@@ -584,16 +583,16 @@ export const LandingPage: React.FC = () => {
               const photo = getDoctorPhoto(doc.user?.full_name, doc.specialization);
 
               return (
-                <div 
-                  key={doc.id} 
+                <div
+                  key={doc.id}
                   className="bg-white rounded-3xl border border-slate-200/90 hover:border-teal-500/50 hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
                 >
                   <div>
                     {/* Doctor Photo */}
                     <div className="relative h-56 overflow-hidden bg-slate-100">
-                      <img 
-                        src={photo} 
-                        alt={doc.user?.full_name || 'Hospital Doctor'} 
+                      <img
+                        src={photo}
+                        alt={doc.user?.full_name || 'Hospital Doctor'}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-slate-800 shadow-sm flex items-center gap-1">
@@ -665,7 +664,7 @@ export const LandingPage: React.FC = () => {
       {/* 6. HOW IT WORKS (STEP-BY-STEP PATIENT JOURNEY) */}
       <section className="py-20 bg-slate-50 border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
               Simple 4-Step Process
@@ -718,7 +717,7 @@ export const LandingPage: React.FC = () => {
       {/* 7. WHY CHOOSE CAREHEALTH POINT */}
       <section id="why-us" className="py-20 bg-white border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
               Institutional Quality
@@ -732,7 +731,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            
+
             <div className="p-7 rounded-3xl bg-slate-50 border border-slate-200/90 shadow-sm space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
                 <Clock className="w-6 h-6" />
@@ -782,7 +781,7 @@ export const LandingPage: React.FC = () => {
       <section className="py-16 bg-slate-900 text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
+
             <div className="lg:col-span-8 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20 text-xs font-bold">
                 <Bot className="w-4 h-4 text-teal-400" />
@@ -792,7 +791,7 @@ export const LandingPage: React.FC = () => {
                 Meet Care Buddy – Your Automated Hospital Navigator
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                Have questions about OPD consultation hours, physician fees, departments, or appointment booking? 
+                Have questions about OPD consultation hours, physician fees, departments, or appointment booking?
                 Our AI assistant queries PostgreSQL in real-time to answer patient inquiries 24 hours a day with clinical safety guardrails.
               </p>
               <div className="flex flex-wrap items-center gap-3 pt-2 text-xs">

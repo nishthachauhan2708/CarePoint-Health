@@ -83,16 +83,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const isDemoLoginAllowed = import.meta.env.VITE_ENABLE_DEMO_LOGIN !== 'false';
+
   const quickLoginAs = async (role: UserRole) => {
-    const credentials: Record<UserRole, { email: string; pass: string }> = {
-      admin: { email: 'admin@carehealth.com', pass: 'Admin@123' },
-      doctor: { email: 'doctor@carehealth.com', pass: 'Doctor@123' },
-      receptionist: { email: 'receptionist@carehealth.com', pass: 'Reception@123' },
-      patient: { email: 'patient@carehealth.com', pass: 'Patient@123' }
+    // In production builds with demo login disabled, reject one-click authentication immediately
+    if (!isDemoLoginAllowed) {
+      throw new Error("Unauthorized: One-click demo persona authentication is disabled in this environment.");
+    }
+
+    const roleEnvMap: Record<UserRole, { emailKey: keyof ImportMetaEnv; passKey: keyof ImportMetaEnv }> = {
+      admin: { emailKey: 'VITE_DEMO_ADMIN_EMAIL', passKey: 'VITE_DEMO_ADMIN_PASSWORD' },
+      doctor: { emailKey: 'VITE_DEMO_DOCTOR_EMAIL', passKey: 'VITE_DEMO_DOCTOR_PASSWORD' },
+      receptionist: { emailKey: 'VITE_DEMO_RECEPTIONIST_EMAIL', passKey: 'VITE_DEMO_RECEPTIONIST_PASSWORD' },
+      patient: { emailKey: 'VITE_DEMO_PATIENT_EMAIL', passKey: 'VITE_DEMO_PATIENT_PASSWORD' },
     };
 
-    const cred = credentials[role];
-    await login(cred.email, cred.pass);
+    const mapping = roleEnvMap[role];
+    if (!mapping) {
+      throw new Error(`Demo login is not supported for role '${role}'.`);
+    }
+
+    const email = import.meta.env[mapping.emailKey];
+    const password = import.meta.env[mapping.passKey];
+
+    if (!email || !password) {
+      throw new Error(
+        `Demo credentials for role '${role}' are not configured. Please set ${mapping.emailKey} and ${mapping.passKey} in your local environment.`
+      );
+    }
+
+    await login(email, password);
   };
 
   return (

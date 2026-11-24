@@ -90,17 +90,21 @@ def test_dashboard_and_queue():
     doctor_id = docs_res.json()[0]["id"]
     dept_id = docs_res.json()[0]["department_id"]
     
-    # Try today, or tomorrow if all slots booked
+    # Find first open slot across upcoming days
     from datetime import timedelta
+    chosen_slot = None
     book_date = date.today().strftime("%Y-%m-%d")
-    slots_res = requests.get(f"{BACKEND_URL}/doctors/{doctor_id}/slots", params={"date": book_date})
-    available_slots = [s["slot"] for s in slots_res.json().get("slots", []) if not s["is_booked"]]
-    if not available_slots:
-        book_date = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
-        slots_res = requests.get(f"{BACKEND_URL}/doctors/{doctor_id}/slots", params={"date": book_date})
-        available_slots = [s["slot"] for s in slots_res.json().get("slots", []) if not s["is_booked"]]
+    for day_offset in range(14):
+        candidate_date = (date.today() + timedelta(days=day_offset)).strftime("%Y-%m-%d")
+        slots_res = requests.get(f"{BACKEND_URL}/doctors/{doctor_id}/slots", params={"date": candidate_date})
+        avail = [s["slot"] for s in slots_res.json().get("slots", []) if not s["is_booked"]]
+        if avail:
+            book_date = candidate_date
+            chosen_slot = avail[0]
+            break
 
-    chosen_slot = available_slots[0] if available_slots else "11:30 - 12:00"
+    if not chosen_slot:
+        chosen_slot = "09:30 - 10:00"
 
     book_res = requests.post(f"{BACKEND_URL}/appointments/", json={
         "doctor_id": doctor_id,

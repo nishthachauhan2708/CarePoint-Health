@@ -23,6 +23,9 @@ export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
 
+  // Environment-controlled demo persona switcher
+  const isDemoEnabled = import.meta.env.VITE_ENABLE_DEMO_LOGIN !== 'false';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -57,6 +60,10 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleQuickLogin = async (role: UserRole) => {
+    if (!isDemoEnabled) {
+      setError('One-click demo authentication is disabled in this environment.');
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
@@ -64,7 +71,7 @@ export const LoginPage: React.FC = () => {
       const targetPath = (location.state as any)?.from || `/dashboard/${role}`;
       navigate(targetPath);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Demo login failed.');
+      setError(err.response?.data?.detail || err.message || 'Demo login failed.');
     } finally {
       setLoading(false);
     }
@@ -116,7 +123,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <div className="pt-8 border-t border-slate-700/60 relative z-10 text-[11px] text-slate-400 space-y-1">
-            <p>24/7 Technical Support Desk: <strong>+91-1800-CARE-NOW</strong></p>
+            <p>24/7 Support Desk (Simulated Demo): <strong>+91-1800-CARE-NOW</strong></p>
             <p className="font-mono text-[10px] text-teal-400">CareHealth Point v2.4 LTS • Build 2026</p>
           </div>
         </div>
@@ -180,7 +187,7 @@ export const LoginPage: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={portalType === 'staff' ? "doctor@carehealth.com or admin@carehealth.com" : "your.email@example.com"}
+                    placeholder={portalType === 'staff' ? "doctor@hospital.org or staff.id@hospital.org" : "patient.email@example.com"}
                     className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all font-medium"
                   />
                 </div>
@@ -252,53 +259,56 @@ export const LoginPage: React.FC = () => {
             </form>
           </div>
 
-          {/* 1-Click Role Switcher (Compact & Elegant) */}
-          <div className="pt-4 border-t border-slate-100 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-                <span>Clinical Role Switcher (Testing & Viva)</span>
-              </span>
-              <span className="text-[10px] text-slate-400">1-Click Auth</span>
+          {/* 1-Click Role Switcher (Compact & Elegant - Environment Controlled) */}
+          {isDemoEnabled && (
+            <div className="pt-4 border-t border-slate-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Clinical Role Switcher (Testing & Viva)</span>
+                </span>
+                <span className="text-[10px] text-slate-400">1-Click Auth</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('admin')}
+                  className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
+                >
+                  <span className="block text-sm mb-0.5">🛡️</span>
+                  <span>Admin</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('doctor')}
+                  className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
+                >
+                  <span className="block text-sm mb-0.5">👨‍⚕️</span>
+                  <span>Doctor</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('receptionist')}
+                  className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
+                >
+                  <span className="block text-sm mb-0.5">📋</span>
+                  <span>Reception</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('patient')}
+                  className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
+                >
+                  <span className="block text-sm mb-0.5">🧑‍🦱</span>
+                  <span>Patient</span>
+                </button>
+              </div>
             </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
-              >
-                <span className="block text-sm mb-0.5">🛡️</span>
-                <span>Admin</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('doctor')}
-                className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
-              >
-                <span className="block text-sm mb-0.5">👨‍⚕️</span>
-                <span>Doctor</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('receptionist')}
-                className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
-              >
-                <span className="block text-sm mb-0.5">📋</span>
-                <span>Reception</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('patient')}
-                className="p-2 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-700 rounded-xl border border-slate-200 text-center text-xs font-semibold transition-all"
-              >
-                <span className="block text-sm mb-0.5">🧑‍🦱</span>
-                <span>Patient</span>
-              </button>
-            </div>
+          )}
 
             <div className="pt-2 text-center text-xs text-slate-500">
               New patient without an account?{' '}
@@ -306,7 +316,6 @@ export const LoginPage: React.FC = () => {
                 Register New Patient & Generate UHID
               </Link>
             </div>
-          </div>
 
         </div>
 
@@ -336,7 +345,7 @@ export const LoginPage: React.FC = () => {
             <div className="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-slate-700">
               <p>• <strong>Hospital Staff:</strong> Please contact the IT Administration Department or hospital supervisor to reset staff clinical credentials.</p>
               <p>• <strong>Patients:</strong> You may register with your current email or contact the front desk with your Universal Hospital ID (UHID).</p>
-              <p>• <strong>Emergency Assistance:</strong> Call hospital desk at +91-1800-CARE-NOW.</p>
+              <p>• <strong>Emergency Assistance:</strong> Call hospital desk at +91-1800-CARE-NOW (Simulated Demo Helpline).</p>
             </div>
 
             <div className="flex justify-end pt-2">
