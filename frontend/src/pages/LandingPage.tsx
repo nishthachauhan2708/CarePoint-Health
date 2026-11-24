@@ -82,32 +82,46 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 1. HERO SECTION WITH REALISTIC HOSPITAL PHOTOGRAPHY */}
-      <section className="relative overflow-hidden bg-white border-b border-slate-200/90 py-16 lg:py-24">
+      <section className="relative overflow-hidden bg-white border-b border-slate-200/90 py-12 lg:py-20">
         {/* Subtle background decoration */}
-        <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 rounded-full bg-teal-50/60 blur-3xl pointer-events-none"></div>
+        <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 rounded-full bg-teal-50/50 blur-3xl pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             
-            {/* Left Column: Hospital Value Proposition & Quick Search */}
+            {/* Left Column: Hospital Value Proposition, Tagline, Heading, Quote & Quick Search */}
             <div className="lg:col-span-7 space-y-6">
               
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold shadow-sm">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold shadow-xs">
                 <Sparkles className="w-4 h-4 text-teal-600" />
                 <span>NABH & JCI Accredited Multispecialty Tertiary Hospital</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                Your Health,<br />
-                <span className="text-teal-600">Our Priority.</span>
-              </h1>
+              <div className="space-y-2">
+                <div className="inline-block text-xs sm:text-sm font-extrabold uppercase tracking-wider text-teal-600 bg-teal-50/60 px-2.5 py-0.5 rounded-md">
+                  Your Health, Our Priority.
+                </div>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+                  Better Healthcare Begins with <span className="text-teal-600">Better Care.</span>
+                </h1>
+              </div>
 
               <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-                CareHealth Point connects patients with board-certified physicians, live OPD queue token progression, encrypted digital health cards (UHID), and round-the-clock emergency medical services.
+                Experience a smarter and more connected healthcare journey. From finding the right specialist and booking appointments to tracking your OPD queue, CareHealth Point makes managing your healthcare easier, more accessible, and more convenient.
               </p>
 
+              {/* Meaningful Healthcare Quote */}
+              <div className="p-3.5 sm:p-4 bg-teal-50/80 rounded-2xl border border-teal-100/90 flex items-center gap-3.5 shadow-xs max-w-xl">
+                <div className="w-8 h-8 rounded-xl bg-teal-600/10 text-teal-700 flex items-center justify-center shrink-0">
+                  <Heart className="w-4 h-4 text-teal-600 fill-teal-100" />
+                </div>
+                <p className="text-xs sm:text-sm text-slate-700 font-medium italic">
+                  "Every patient deserves compassionate care, timely attention, and a healthier tomorrow."
+                </p>
+              </div>
+
               {/* Integrated Hero Doctor Search Bar */}
-              <form onSubmit={handleHeroSearch} className="bg-slate-50 p-2 sm:p-2.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-2 max-w-xl">
+              <form onSubmit={handleHeroSearch} className="bg-slate-50 p-2 sm:p-2.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-2 max-w-xl">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                   <input
@@ -120,7 +134,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-teal-600/25 transition-all flex items-center justify-center gap-2"
+                  className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-teal-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
                   <Search className="w-4 h-4" />
                   <span>Find Doctor</span>
@@ -130,25 +144,25 @@ export const LandingPage: React.FC = () => {
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-1">
                 <Link
-                  to="/doctors"
-                  className="px-6 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-teal-600/20 transition-all flex items-center gap-2 group"
+                  to={user?.role === 'patient' ? '/dashboard/patient?tab=book' : '/doctors'}
+                  className="px-6 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-teal-600/20 transition-all flex items-center gap-2 group active:scale-95"
                 >
                   <Calendar className="w-4 h-4" />
-                  <span>Book Appointment</span>
+                  <span>Book an Appointment</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
                 <Link
                   to="/doctors"
-                  className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm rounded-xl border border-slate-200 shadow-sm transition-all flex items-center gap-2"
+                  className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm rounded-xl border border-slate-200 shadow-xs transition-all flex items-center gap-2 active:scale-95"
                 >
                   <Stethoscope className="w-4 h-4 text-teal-600" />
-                  <span>Explore Doctors</span>
+                  <span>Explore Our Doctors</span>
                 </Link>
               </div>
 
               {/* Key Hospital Statistics */}
-              <div className="grid grid-cols-3 gap-6 pt-6 border-t border-slate-200/80 max-w-lg">
+              <div className="grid grid-cols-3 gap-6 pt-5 border-t border-slate-200/80 max-w-lg">
                 <div>
                   <div className="text-2xl sm:text-3xl font-black text-slate-900">100%</div>
                   <div className="text-xs text-slate-500 font-semibold">Verified Doctors</div>
@@ -169,58 +183,37 @@ export const LandingPage: React.FC = () => {
             <div className="lg:col-span-5 space-y-4">
               
               {/* Primary Realistic Hospital Photograph */}
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 group">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/90 group bg-slate-100">
                 <img 
-                  src={HOSPITAL_IMAGES.hospitalFacility} 
-                  alt="CareHealth Point Hospital Medical Complex"
-                  className="w-full h-72 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+                  src={HOSPITAL_IMAGES.heroBanner} 
+                  alt="CareHealth Point Multispecialty Hospital Modern Facility and Reception"
+                  className="w-full h-80 sm:h-96 lg:h-[440px] object-cover group-hover:scale-102 transition-transform duration-500"
+                  loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex items-end p-6">
-                  <div className="text-white space-y-1">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent p-6 text-white">
+                  <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider bg-teal-600 px-2.5 py-0.5 rounded-full text-white inline-block">
-                      Tertiary Healthcare Campus
+                      Modern Tertiary Campus
                     </span>
-                    <h3 className="font-extrabold text-xl text-white">CareHealth Point Multispecialty Hospital</h3>
-                    <p className="text-xs text-slate-300">Level-1 Trauma Center, 6 Modular Procedural Suites & 120 Intensive Care Beds</p>
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-900/90 border border-slate-700 px-2 py-0.5 rounded-full text-teal-300">
+                      NABH Accredited
+                    </span>
                   </div>
+                  <h3 className="font-extrabold text-lg sm:text-xl text-white">CareHealth Point Multispecialty Hospital</h3>
+                  <p className="text-xs text-slate-200 line-clamp-1">Level-1 Trauma Center, 6 Modular Procedural Suites & 120 Intensive Care Beds</p>
                 </div>
               </div>
 
-              {/* Live Facility Telemetry Card */}
-              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                    <Activity className="w-4 h-4 text-teal-600" />
-                    <span>Hospital Outpatient Excellence</span>
-                  </div>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    NABH Accredited
-                  </span>
+              {/* Real Facility Telemetry Highlights */}
+              <div className="bg-slate-50/90 rounded-2xl p-4 border border-slate-200 shadow-xs flex items-center justify-between text-xs text-slate-600">
+                <div className="flex items-center gap-2 font-medium text-slate-700">
+                  <Clock className="w-4 h-4 text-teal-600" />
+                  <span>OPD Consultation: <strong>Mon – Sat, 8:30 AM – 8:00 PM</strong></span>
                 </div>
-
-                <div className="space-y-2 text-xs text-slate-600">
-                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">OPD Consultation Hours:</span>
-                    <span className="font-bold text-slate-900">Mon – Sat, 8:30 AM – 8:00 PM</span>
-                  </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Chamber Allocation:</span>
-                    <span className="font-bold text-teal-700">Dedicated 30-Min Time Slots</span>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-slate-500 font-medium">Digital Identification:</span>
-                    <span className="font-bold text-slate-900">Encrypted UHID & E-Prescriptions</span>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-600">
-                  <span className="flex items-center gap-1 font-medium text-slate-600">
-                    <Clock className="w-3.5 h-3.5 text-teal-600" /> Token progression tracked in real-time
-                  </span>
-                  <Link to="/doctors" className="font-bold text-teal-600 hover:text-teal-700 text-[11px]">
-                    View Schedule →
-                  </Link>
-                </div>
+                <Link to="/doctors" className="font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                  <span>View Roster</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
 
             </div>

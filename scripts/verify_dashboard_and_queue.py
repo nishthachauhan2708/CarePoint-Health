@@ -85,17 +85,28 @@ def test_dashboard_and_queue():
     assert empty_q.status_code == 404, f"Expected 404 for empty queue, got {empty_q.status_code}"
     print(" -> Empty State Verified: No active queue returns 404 ('No Active Queue Found')")
 
-    # Step B: Book appointment
+    # Step B: Book appointment using first open slot
     docs_res = requests.get(f"{BACKEND_URL}/doctors/")
     doctor_id = docs_res.json()[0]["id"]
     dept_id = docs_res.json()[0]["department_id"]
+    
+    # Try today, or tomorrow if all slots booked
+    from datetime import timedelta
     book_date = date.today().strftime("%Y-%m-%d")
+    slots_res = requests.get(f"{BACKEND_URL}/doctors/{doctor_id}/slots", params={"date": book_date})
+    available_slots = [s["slot"] for s in slots_res.json().get("slots", []) if not s["is_booked"]]
+    if not available_slots:
+        book_date = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
+        slots_res = requests.get(f"{BACKEND_URL}/doctors/{doctor_id}/slots", params={"date": book_date})
+        available_slots = [s["slot"] for s in slots_res.json().get("slots", []) if not s["is_booked"]]
+
+    chosen_slot = available_slots[0] if available_slots else "11:30 - 12:00"
 
     book_res = requests.post(f"{BACKEND_URL}/appointments/", json={
         "doctor_id": doctor_id,
         "department_id": dept_id,
         "appointment_date": book_date,
-        "time_slot": "10:30 - 11:00",
+        "time_slot": chosen_slot,
         "symptoms": "Follow-up consultation for blood pressure"
     }, headers=patient_headers)
     assert book_res.status_code == 201, f"Booking failed: {book_res.text}"
