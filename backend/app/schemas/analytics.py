@@ -34,6 +34,8 @@ class DoctorWorkload(BaseModel):
 
 class HospitalAnalytics(BaseModel):
     total_patients: int
+    new_patients: int = 0
+    old_patients: int = 0
     total_doctors: int
     total_departments: int
     total_appointments: int

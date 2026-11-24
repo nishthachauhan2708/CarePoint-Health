@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { 
   CreditCard, Calendar, Clock, FileText, CheckCircle, 
   AlertCircle, ChevronRight, User, Stethoscope, Building2, 
   X, Phone, Heart, Activity, ArrowRight, ShieldCheck, Download,
-  Edit3, MapPin, Droplets, QrCode, RefreshCw
+  Edit3, MapPin, Droplets, QrCode, RefreshCw, Bell, Sparkles,
+  ArrowUpRight
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { 
@@ -15,12 +17,22 @@ import { useAuth } from '../../context/AuthContext';
 
 export const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('overview');
   const [healthCard, setHealthCard] = useState<DigitalHealthCard | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [activeQueue, setActiveQueue] = useState<QueueStatus | null>(null);
+  const [queueRefreshing, setQueueRefreshing] = useState(false);
+  const [queueError, setQueueError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   // Edit Profile Modal States
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -119,6 +131,32 @@ export const PatientDashboard: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleRefreshQueue = async (targetApptId?: number) => {
+    setQueueRefreshing(true);
+    setQueueError(null);
+    try {
+      if (targetApptId) {
+        const qData = await api.appointments.getQueueStatus(targetApptId);
+        setActiveQueue(qData);
+      } else if (activeQueue?.appointment_id) {
+        const qData = await api.appointments.getQueueStatus(activeQueue.appointment_id);
+        setActiveQueue(qData);
+      } else {
+        const qData = await api.appointments.getMyActiveQueue();
+        setActiveQueue(qData);
+      }
+    } catch (err: any) {
+      // If endpoint returns 404, activeQueue is null
+      if (err.response?.status === 404) {
+        setActiveQueue(null);
+      } else {
+        setQueueError(err.response?.data?.detail || "Could not retrieve live queue status.");
+      }
+    } finally {
+      setQueueRefreshing(false);
+    }
+  };
 
   // Real-time polling for live queue telemetry (polls every 15s when activeQueue exists)
   useEffect(() => {
@@ -910,6 +948,296 @@ export const PatientDashboard: React.FC = () => {
                       <p className="text-xs">No prescriptions recorded yet. Completed appointments with doctors will generate official digital prescriptions.</p>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: LIVE QUEUE TRACKER */}
+          {activeTab === 'queue' && (
+            <div className="space-y-6">
+              
+              {/* Header Strip with Live Badge & Refresh Button */}
+              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-teal-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900">Live OPD Queue Tracker</h2>
+                      <p className="text-xs text-slate-500">
+                        Hello, <strong>{user?.full_name}</strong>. Real-time consultation chamber progression and token telemetry
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>Live Chamber Stream</span>
+                  </span>
+
+                  <button
+                    onClick={() => handleRefreshQueue(activeQueue?.appointment_id)}
+                    disabled={queueRefreshing}
+                    className="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 text-teal-600 ${queueRefreshing ? 'animate-spin' : ''}`} />
+                    <span>{queueRefreshing ? 'Syncing...' : 'Refresh Status'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Error Alert */}
+              {queueError && (
+                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between gap-2 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{queueError}</span>
+                  </div>
+                  <button
+                    onClick={() => handleRefreshQueue()}
+                    className="px-3 py-1 bg-white text-rose-700 hover:bg-rose-100 rounded-lg font-semibold border border-rose-200 transition-colors"
+                  >
+                    Retry Connection
+                  </button>
+                </div>
+              )}
+
+              {/* Multiple Appointments Selector Pill Bar */}
+              {appointments.filter(a => a.status === 'confirmed' || a.status === 'pending').length > 1 && (
+                <div className="bg-slate-100/80 p-2 rounded-2xl flex items-center gap-2 overflow-x-auto text-xs border border-slate-200">
+                  <span className="text-slate-500 font-semibold pl-2 whitespace-nowrap">Select Appointment:</span>
+                  {appointments.filter(a => a.status === 'confirmed' || a.status === 'pending').map((a) => {
+                    const isSelected = activeQueue?.appointment_id === a.id;
+                    return (
+                      <button
+                        key={a.id}
+                        onClick={() => handleRefreshQueue(a.id)}
+                        className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                          isSelected 
+                            ? 'bg-teal-600 text-white shadow-sm shadow-teal-600/30' 
+                            : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
+                        }`}
+                      >
+                        <span>Token #{a.queue_number}</span>
+                        <span className="opacity-80">({a.doctor_name?.replace('Dr. ', '')})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Active Queue Display */}
+              {activeQueue ? (
+                <div className="space-y-6">
+                  {/* Hero Chamber Card */}
+                  <div className="bg-white rounded-3xl border border-slate-200 p-7 lg:p-8 shadow-sm space-y-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-56 h-56 rounded-full bg-teal-500/5 blur-3xl pointer-events-none"></div>
+
+                    {/* Top Row: Doctor Info & Appointment Slot */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold shadow-inner">
+                          <Stethoscope className="w-6 h-6 text-teal-600" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-extrabold text-slate-900 text-base">{activeQueue.doctor_name}</h3>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-800 uppercase tracking-wide">
+                              Chamber Assigned
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            {activeQueue.department_name} Center of Clinical Excellence
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="sm:text-right">
+                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Scheduled Slot</span>
+                        <span className="text-sm font-bold text-slate-800 font-mono flex items-center sm:justify-end gap-1.5 mt-0.5">
+                          <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                          <span>{activeQueue.time_slot}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Big Numbers Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                      <div className="p-4 bg-teal-50/70 border border-teal-200/80 rounded-2xl">
+                        <span className="text-[10px] font-bold text-teal-900 uppercase tracking-wider block mb-1">Your Token #</span>
+                        <span className="text-4xl font-black text-teal-700 font-mono">#{activeQueue.queue_number}</span>
+                        <span className="text-[10px] text-teal-600 font-medium block mt-1">Confirmed OPD Token</span>
+                      </div>
+
+                      <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">In Chamber Now</span>
+                        <span className="text-4xl font-black text-slate-900 font-mono">#{activeQueue.current_serving_number}</span>
+                        <span className="text-[10px] text-slate-500 font-medium block mt-1">Currently with Doctor</span>
+                      </div>
+
+                      <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Patients Ahead</span>
+                        <span className={`text-4xl font-black font-mono ${activeQueue.patients_ahead === 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
+                          {activeQueue.patients_ahead}
+                        </span>
+                        <span className="text-[10px] font-medium block mt-1 text-slate-500">
+                          {activeQueue.patients_ahead === 0 ? "You're next in turn!" : "Waiting in lounge"}
+                        </span>
+                      </div>
+
+                      <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Est. Waiting Time</span>
+                        <span className="text-4xl font-black text-slate-900 font-mono">
+                          {activeQueue.patients_ahead === 0 ? "0" : `~${activeQueue.estimated_wait_minutes}`}
+                        </span>
+                        <span className="text-[10px] font-medium block mt-1 text-slate-500">
+                          {activeQueue.patients_ahead === 0 ? "Please approach door" : "Minutes estimated"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Visual Queue Progress Indicator / Stepper */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-800">Chamber Queue Progression</span>
+                        <span className="font-semibold text-teal-700">
+                          {activeQueue.patients_ahead === 0 
+                            ? "Status: Ready for Consultation" 
+                            : activeQueue.current_serving_number === activeQueue.queue_number
+                            ? "Status: Currently Inside Chamber"
+                            : `Status: Position #${activeQueue.patients_ahead + 1} in Waiting Line`}
+                        </span>
+                      </div>
+
+                      <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                        <div 
+                          className="h-full rounded-full bg-gradient-to-r from-teal-500 via-teal-600 to-emerald-500 transition-all duration-700 shadow-sm"
+                          style={{
+                            width: `${Math.min(100, Math.max(15, Math.round((activeQueue.current_serving_number / (activeQueue.queue_number || 1)) * 100)))}%`
+                          }}
+                        ></div>
+                      </div>
+
+                      {/* 4 Step Milestones */}
+                      <div className="grid grid-cols-4 gap-2 pt-2 text-center text-[11px]">
+                        <div className="flex flex-col items-center">
+                          <span className="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs mb-1">✓</span>
+                          <span className="font-semibold text-slate-900">Token Issued</span>
+                          <span className="text-[9px] text-slate-400 font-mono">#{activeQueue.queue_number}</span>
+                        </div>
+
+                        <div className="flex flex-col items-center">
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs mb-1 ${
+                            activeQueue.patients_ahead > 0 ? 'bg-teal-600 text-white animate-pulse' : 'bg-slate-200 text-slate-600'
+                          }`}>
+                            2
+                          </span>
+                          <span className="font-semibold text-slate-900">Lounge Waiting</span>
+                          <span className="text-[9px] text-slate-400">Level 1 OPD</span>
+                        </div>
+
+                        <div className="flex flex-col items-center">
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs mb-1 ${
+                            activeQueue.patients_ahead === 0 ? 'bg-emerald-600 text-white animate-bounce' : 'bg-slate-200 text-slate-600'
+                          }`}>
+                            3
+                          </span>
+                          <span className="font-semibold text-slate-900">Door Call</span>
+                          <span className="text-[9px] text-slate-400">Next In Turn</span>
+                        </div>
+
+                        <div className="flex flex-col items-center">
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs mb-1 ${
+                            activeQueue.status === 'completed' ? 'bg-teal-700 text-white' : 'bg-slate-200 text-slate-600'
+                          }`}>
+                            4
+                          </span>
+                          <span className="font-semibold text-slate-900">Consultation</span>
+                          <span className="text-[9px] text-slate-400">e-Prescription</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Patient Guidance Strip */}
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-2 text-slate-600">
+                        <CheckCircle className="w-4 h-4 text-teal-600 shrink-0" />
+                        <span>Please keep your <strong>Digital Health Card QR</strong> ready for quick nurse triage scanning.</span>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('healthcard')}
+                        className="text-teal-700 hover:text-teal-800 font-bold whitespace-nowrap underline"
+                      >
+                        View Digital Health Card →
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              ) : (
+                /* Empty State Screen when no active queue */
+                <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center shadow-sm space-y-6">
+                  <div className="w-20 h-20 rounded-3xl bg-teal-50 text-teal-600 mx-auto flex items-center justify-center shadow-inner">
+                    <Clock className="w-10 h-10 text-teal-600" />
+                  </div>
+
+                  <div className="max-w-md mx-auto space-y-2">
+                    <h3 className="text-xl font-bold text-slate-900">No Active Queue Found</h3>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      You currently do not have an active outpatient appointment in the chamber queue today. 
+                      Once you schedule an appointment with our clinical specialists, your live token position, 
+                      current serving chamber number, and estimated waiting time will appear here automatically.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <button
+                      onClick={() => setActiveTab('book')}
+                      className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-md shadow-teal-600/20 transition-all flex items-center gap-1.5"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      <span>Book Outpatient Consultation</span>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('overview')}
+                      className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors"
+                    >
+                      <span>View Health Records</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleRefreshQueue()}
+                      className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Check Again</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* TAB 6: NOTIFICATIONS */}
+          {activeTab === 'notifications' && (
+            <div className="space-y-4">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-base">Patient Notifications</h3>
+                    <p className="text-xs text-slate-500">Appointment updates, queue alerts, and clinical announcements</p>
+                  </div>
+                </div>
+
+                <div className="py-12 text-center text-slate-400 space-y-2">
+                  <Bell className="w-8 h-8 text-slate-300 mx-auto" />
+                  <p className="text-xs">No unread notifications. All clinical appointment confirmations are delivered here.</p>
                 </div>
               </div>
             </div>

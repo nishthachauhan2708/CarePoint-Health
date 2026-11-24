@@ -73,3 +73,9 @@ def test_book_appointment_and_prevent_duplicates(client, patient_token):
     cancel_res = client.patch(f"/api/v1/appointments/{appt_id}/status", json={"status": "cancelled"}, headers=headers)
     assert cancel_res.status_code == 200
     assert cancel_res.json()["status"] == "cancelled"
+
+def test_my_active_queue_endpoint(client, patient_token):
+    headers = {"Authorization": f"Bearer {patient_token}"}
+    # When no active appointment, returns 404
+    res = client.get("/api/v1/appointments/my-queue/active", headers=headers)
+    assert res.status_code in [200, 404]

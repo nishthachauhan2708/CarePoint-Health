@@ -1,5 +1,5 @@
 from typing import Optional
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel
 from app.schemas.user import UserOut
 
@@ -33,9 +33,29 @@ class PatientOut(PatientBase):
     user_id: int
     patient_uhid: str
     user: Optional[UserOut] = None
+    age: Optional[int] = None
+    registered_at: Optional[datetime] = None
+    admission_date: Optional[date] = None
+    medical_category: Optional[str] = None
+    clinical_status: Optional[str] = None
+    total_appointments: int = 0
 
     class Config:
         from_attributes = True
+
+class RecentPatientActivityOut(BaseModel):
+    id: str
+    patient_id: int
+    patient_name: str
+    uhid: str
+    avatar_url: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    disease_or_condition: str
+    activity_description: str
+    status: str
+    timestamp: datetime
+    formatted_time: str
 
 class DigitalHealthCard(BaseModel):
     uhid: str

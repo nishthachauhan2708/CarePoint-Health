@@ -58,6 +58,27 @@ export interface Patient {
   allergies?: string;
   chronic_conditions?: string;
   user?: User;
+  age?: number;
+  registered_at?: string;
+  admission_date?: string;
+  medical_category?: string;
+  clinical_status?: string;
+  total_appointments?: number;
+}
+
+export interface RecentPatientActivity {
+  id: string;
+  patient_id: number;
+  patient_name: string;
+  uhid: string;
+  avatar_url?: string;
+  age?: number;
+  gender?: string;
+  disease_or_condition: string;
+  activity_description: string;
+  status: string;
+  timestamp: string;
+  formatted_time: string;
 }
 
 export interface DigitalHealthCard {
@@ -161,6 +182,8 @@ export interface Notification {
 
 export interface HospitalAnalytics {
   total_patients: number;
+  new_patients?: number;
+  old_patients?: number;
   total_doctors: number;
   total_departments: number;
   total_appointments: number;

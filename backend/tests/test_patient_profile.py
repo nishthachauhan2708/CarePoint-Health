@@ -95,3 +95,15 @@ def test_patient_isolation(client, patient_token):
     # ID 99999 does not exist
     res = client.get("/api/v1/patients/99999/health-card", headers=headers)
     assert res.status_code == 404
+
+def test_recent_patient_activities(client, admin_token):
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    res = client.get("/api/v1/patients/recent-activities", headers=headers)
+    assert res.status_code == 200
+    activities = res.json()
+    assert isinstance(activities, list)
+    if len(activities) > 0:
+        first = activities[0]
+        assert "patient_name" in first
+        assert "status" in first
+        assert "disease_or_condition" in first

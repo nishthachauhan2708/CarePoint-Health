@@ -50,9 +50,19 @@ def setup_test_db():
         icon="Heart",
         head_doctor_name="Dr. Test"
     )
-    db.add(dept)
+
+    neuro_dept = Department(
+        name="Neurology",
+        code="NEURO",
+        description="Brain and nervous system care",
+        icon="Brain",
+        head_doctor_name="Dr. Priya Nair"
+    )
+
+    db.add_all([dept, neuro_dept])
     db.commit()
     db.refresh(dept)
+    db.refresh(neuro_dept)
 
     # Create Doctor User & Profile
     doc_user = User(

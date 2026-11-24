@@ -2,7 +2,7 @@ import axios from 'axios';
 import { 
   User, Department, Doctor, Patient, DigitalHealthCard, 
   Appointment, QueueStatus, Prescription, ConsultationNote, 
-  Notification, HospitalAnalytics, AppointmentStatus 
+  Notification, HospitalAnalytics, AppointmentStatus, RecentPatientActivity 
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
@@ -136,6 +136,10 @@ export const api = {
       const res = await apiClient.get(`/patients/verify-card/${uhid}`);
       return res.data;
     },
+    getRecentActivities: async (): Promise<RecentPatientActivity[]> => {
+      const res = await apiClient.get('/patients/recent-activities');
+      return res.data;
+    },
   },
 
   // Chatbot (Care Buddy)
@@ -166,6 +170,10 @@ export const api = {
     },
     getQueueStatus: async (id: number): Promise<QueueStatus> => {
       const res = await apiClient.get(`/appointments/${id}/queue`);
+      return res.data;
+    },
+    getMyActiveQueue: async (): Promise<QueueStatus> => {
+      const res = await apiClient.get('/appointments/my-queue/active');
       return res.data;
     },
   },

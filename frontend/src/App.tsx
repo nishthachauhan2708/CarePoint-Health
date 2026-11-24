@@ -43,6 +43,8 @@ export const App: React.FC = () => {
 
               <Route element={<ProtectedRoute allowedRoles={['patient']} />}>
                 <Route path="/dashboard/patient" element={<PatientDashboard />} />
+                <Route path="/queue" element={<Navigate to="/dashboard/patient?tab=queue" replace />} />
+                <Route path="/dashboard/queue" element={<Navigate to="/dashboard/patient?tab=queue" replace />} />
               </Route>
 
               <Route element={<ProtectedRoute allowedRoles={['receptionist']} />}>

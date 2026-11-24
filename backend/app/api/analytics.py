@@ -1,9 +1,10 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database.session import get_db
+from app.models.user import User
 from app.models.patient import Patient
 from app.models.doctor import Doctor
 from app.models.department import Department
@@ -16,6 +17,10 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
 @router.get("/summary", response_model=HospitalAnalytics)
 def get_hospital_analytics(db: Session = Depends(get_db)):
     total_patients = db.query(Patient).count()
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    new_patients = db.query(Patient).join(User).filter(User.created_at >= thirty_days_ago).count()
+    old_patients = max(0, total_patients - new_patients)
+
     total_doctors = db.query(Doctor).count()
     total_departments = db.query(Department).count()
     total_appointments = db.query(Appointment).count()
@@ -60,6 +65,8 @@ def get_hospital_analytics(db: Session = Depends(get_db)):
 
     return HospitalAnalytics(
         total_patients=total_patients,
+        new_patients=new_patients,
+        old_patients=old_patients,
         total_doctors=total_doctors,
         total_departments=total_departments,
         total_appointments=total_appointments,

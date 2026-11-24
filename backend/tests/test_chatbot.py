@@ -20,6 +20,7 @@ def test_chatbot_departments(client):
     assert res.status_code == 200
     data = res.json()
     assert "Cardiology" in data["reply"]
+    assert "Neurology" in data["reply"]
     assert data["intent"] == "departments_list"
 
 def test_chatbot_doctor_query(client):
@@ -53,3 +54,4 @@ def test_chatbot_medical_advice_safety_refusal(client):
     # Must refuse prescription / medical diagnosis and advise specialist consultation or emergency line
     assert "Clinical Safety Notice" in data["reply"] or "Emergency" in data["reply"]
     assert "+91-1800-CARE-NOW" in data["reply"]
+

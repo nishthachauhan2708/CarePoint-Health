@@ -184,6 +184,64 @@ def get_appointments(
         )
     return results
 
+@router.get("/my-queue/active", response_model=QueueStatus)
+def get_my_active_queue_status(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Directly retrieves the active OPD queue position and chamber progression for the logged-in patient.
+    """
+    if current_user.role != "patient" or not current_user.patient_profile:
+        # Check if staff wants to test or has no patient profile
+        raise HTTPException(status_code=400, detail="Active queue is only available for patient accounts.")
+
+    patient_id = current_user.patient_profile.id
+    today = date.today()
+
+    # Look for today's active appointment first
+    appt = db.query(Appointment).filter(
+        Appointment.patient_id == patient_id,
+        Appointment.appointment_date == today,
+        Appointment.status.in_(["pending", "confirmed"])
+    ).first()
+
+    # Fallback to any active upcoming appointment
+    if not appt:
+        appt = db.query(Appointment).filter(
+            Appointment.patient_id == patient_id,
+            Appointment.status.in_(["pending", "confirmed"])
+        ).order_by(Appointment.appointment_date.asc()).first()
+
+    if not appt:
+        raise HTTPException(
+            status_code=404,
+            detail="No active OPD queue token found. Please schedule an outpatient appointment."
+        )
+
+    # Compute live queue position for this doctor and date
+    completed_or_serving = db.query(func.count(Appointment.id)).filter(
+        Appointment.doctor_id == appt.doctor_id,
+        Appointment.appointment_date == appt.appointment_date,
+        Appointment.status == "completed"
+    ).scalar() or 0
+
+    current_serving = max(1, completed_or_serving + 1)
+    patients_ahead = max(0, appt.queue_number - current_serving)
+    estimated_wait = patients_ahead * 15
+
+    return QueueStatus(
+        appointment_id=appt.id,
+        queue_number=appt.queue_number,
+        current_serving_number=current_serving,
+        patients_ahead=patients_ahead,
+        estimated_wait_minutes=estimated_wait,
+        status=appt.status,
+        doctor_name=appt.doctor.user.full_name if appt.doctor and appt.doctor.user else "Doctor",
+        department_name=appt.department.name if appt.department else "OPD",
+        time_slot=appt.time_slot
+    )
+
 @router.get("/{id}", response_model=AppointmentOut)
 def get_appointment(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     a = db.query(Appointment).filter(Appointment.id == id).first()
